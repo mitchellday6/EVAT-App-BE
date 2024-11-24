@@ -1,7 +1,7 @@
 # EVAT-Data-Science
 - Company: Chameleon
 - Project: EV Adoption Tools
-- Team: Data Science
+- Team: Mobile/App
 
 ### Tech Stack
 - NodeJS
