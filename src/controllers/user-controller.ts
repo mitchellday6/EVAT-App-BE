@@ -24,7 +24,13 @@ export default class UserController {
 
     try {
       const user = await this.userService.authenticate(email, password);
-      return res.status(200).json({ message: "Login successful", user });
+      const outcome = {
+        _id: user.id,
+        email: user.email,
+        fullName: user.fullName,
+        role: user.role,
+      };
+      return res.status(200).json({ message: "Login successful", outcome });
     } catch (error: any) {
       return res.status(401).json({ message: error.message });
     }
