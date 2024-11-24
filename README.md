@@ -1,4 +1,4 @@
-# EVAT-Data-Science
+# EVAT-Mobile/App
 - Company: Chameleon
 - Project: EV Adoption Tools
 - Team: Mobile/App
