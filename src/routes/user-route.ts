@@ -1,6 +1,7 @@
 import { Router } from "express";
 import UserController from "../controllers/user-controller";
 import UserService from "../services/user-service";
+import { authGuard } from "../middlewares/auth-middleware";
 
 const router = Router();
 const userService = new UserService();
@@ -63,7 +64,12 @@ router.post("/register", (req, res) => userController.register(req, res));
  */
 router.post("/login", (req, res) => userController.login(req, res));
 
-// Get user by ID
-router.get("/:id", (req, res) => userController.getUserById(req, res));
+// Protected routes
+router.get("/profile", authGuard(["user", "admin"]), (req, res) =>
+  userController.getUserById(req, res)
+);
+router.get("/user-list", authGuard(["admin"]), (req, res) =>
+  userController.getAllUser(req, res)
+);
 
 export default router;
