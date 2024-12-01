@@ -23,12 +23,13 @@ export default class UserController {
     const { email, password } = req.body;
 
     try {
-      const user = await this.userService.authenticate(email, password);
+      const user: { user: any; token: string } = await this.userService.authenticate(email, password);
       const outcome = {
-        _id: user.id,
-        email: user.email,
-        fullName: user.fullName,
-        role: user.role,
+        _id: user.user.id,
+        email: user.user.email,
+        fullName: user.user.fullName,
+        role: user.user.role,
+        token: user.token,
       };
       return res.status(200).json({ message: "Login successful", outcome });
     } catch (error: any) {
