@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import UserService from "../services/user-service";
+import { UserItemResponse } from "../dtos/user-item-response";
 
 export default class UserController {
   constructor(private readonly userService: UserService) {}
@@ -23,14 +24,10 @@ export default class UserController {
     const { email, password } = req.body;
 
     try {
-      const user = await this.userService.authenticate(email, password);
-      const outcome = {
-        _id: user.id,
-        email: user.email,
-        fullName: user.fullName,
-        role: user.role,
-      };
-      return res.status(200).json({ message: "Login successful", outcome });
+      const token = await this.userService.authenticate(email, password);
+      return res
+        .status(200)
+        .json({ message: "Login successful", accessToken: token });
     } catch (error: any) {
       return res.status(401).json({ message: error.message });
     }
@@ -38,14 +35,26 @@ export default class UserController {
 
   // Get user by ID
   async getUserById(req: Request, res: Response): Promise<Response> {
-    const { id } = req.params;
+    const { user } = req;
 
     try {
-      const user = await this.userService.getUserById(id);
-      if (!user) {
+      const existingUser = await this.userService.getUserById(user?.id);
+      if (!existingUser) {
         return res.status(404).json({ message: "User not found" });
       }
-      return res.status(200).json(user);
+      return res.status(200).json(new UserItemResponse(existingUser));
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message });
+    }
+  }
+
+  // Get user by ID
+  async getAllUser(req: Request, res: Response): Promise<Response> {
+    try {
+      const existingUsers = await this.userService.getAllUser();
+      return res
+        .status(200)
+        .json(existingUsers.map((u) => new UserItemResponse(u)));
     } catch (error: any) {
       return res.status(500).json({ message: error.message });
     }

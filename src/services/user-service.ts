@@ -1,6 +1,7 @@
 import User from "../models/user-model";
 import UserRepository from "../repositories/user-repository";
 import bcrypt from "bcryptjs";
+import generateToken from "../utils/generate-token";
 
 export default class UserService {
   async register(
@@ -31,12 +32,15 @@ export default class UserService {
     }
   }
 
-  async authenticate(email: string, password: string): Promise<any> {
+  async authenticate(email: string, password: string): Promise<string> {
     try {
       const existingUser = await UserRepository.findByEmail(email);
       if (existingUser) {
         if (bcrypt.compareSync(password, existingUser.password)) {
-          return existingUser;
+          // Generate JWT token
+          const token = generateToken(existingUser);
+          // Return both user and token
+          return token;
         } else {
           throw new Error(`Invalid password for email = [${email}] `);
         }
@@ -46,6 +50,10 @@ export default class UserService {
     } catch (e) {
       throw e;
     }
+  }
+
+  async getAllUser() {
+    return await UserRepository.findAll();
   }
 
   async getUserById(userId: string) {
