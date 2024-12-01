@@ -4,13 +4,14 @@ import bcrypt from "bcryptjs";
 import generateToken from "../utils/generate-token";
 
 export default class UserService {
+  // Register a new user
   async register(
     email: string,
     password: string,
     fullName: string
   ): Promise<any> {
     try {
-      // Check if there is an existing user with given email
+      // Check if there is an existing user with the given email
       const existingUser = await UserRepository.findByEmail(email);
       if (existingUser) {
         throw new Error(
@@ -27,8 +28,13 @@ export default class UserService {
       newUser.fullName = fullName;
 
       return await UserRepository.create(newUser);
-    } catch (e) {
-      throw e;
+    } catch (e: unknown) {
+      // Safely handle error if it's an instance of Error
+      if (e instanceof Error) {
+        throw new Error("Error during user registration: " + e.message);
+      } else {
+        throw new Error("An unknown error occurred during registration.");
+      }
     }
   }
 
@@ -47,8 +53,13 @@ export default class UserService {
       } else {
         throw new Error(`The account with email = [${email}] does not exist`);
       }
-    } catch (e) {
-      throw e;
+    } catch (e: unknown) {
+      // Safely handle error if it's an instance of Error
+      if (e instanceof Error) {
+        throw new Error("Authentication failed: " + e.message);
+      } else {
+        throw new Error("An unknown error occurred during authentication.");
+      }
     }
   }
 
@@ -60,6 +71,7 @@ export default class UserService {
     return await UserRepository.findOne({ _id: userId });
   }
 
+  // Hash password
   async hashPassword(password: string) {
     const salt = await bcrypt.genSalt();
     const hashPassword = await bcrypt.hash(password, salt);
