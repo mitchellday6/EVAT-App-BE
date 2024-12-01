@@ -5,6 +5,8 @@ import swaggerUi from "swagger-ui-express";
 import swaggerJSDoc from "swagger-jsdoc";
 import { notFound, errorHandler } from "./src/middlewares/error-middleware";
 import UserRoutes from "./src/routes/user-route";
+import ProfileRoutes from "./src/routes/profile-route";
+import VehicleRoutes from "./src/routes/vehicle-route";
 import cors from "cors";
 
 dotenv.config();
@@ -47,6 +49,8 @@ app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // User Route
 app.use("/api/auth", UserRoutes);
+app.use("/api/profile", ProfileRoutes);
+app.use("/api/vehicle", VehicleRoutes);
 
 // Middleware
 app.use(notFound);
