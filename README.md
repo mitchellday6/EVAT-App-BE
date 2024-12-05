@@ -15,7 +15,7 @@
 Create a .env file in then root and add the following
 
 ```
-PORT = 5000
+PORT = 8080
 MONGODB_URI = MongoDB Uri
 JWT_SECRET = 'abc123'
 ```
