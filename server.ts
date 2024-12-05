@@ -12,32 +12,39 @@ import cors from "cors";
 dotenv.config();
 
 const app: Application = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8080;
 
 connectDB();
 
 app.use(cors());
 app.use(express.json());
 
-
 // Swagger definition
-const swaggerDefinition = {
-  openapi: "3.0.0", // Swagger version
-  info: {
-    title: "EVAT API",
-    version: "1.0.0",
-    description: "API documentation for EVAT App",
-  },
-  servers: [
-    {
-      url: `http://localhost:${PORT}`, // Your API URL
-    },
-  ],
-};
-
-// Options for swagger-jsdoc
 const options = {
-  swaggerDefinition,
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "EVAT API",
+      version: "1.0.0",
+      description: "API documentation for EVAT App",
+    },
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+          in: "header",
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
+    servers: [{ url: `http://localhost:${PORT}` }],
+  },
   apis: ["./src/routes/*.ts", "./src/routes/*.js"],
 };
 
@@ -45,7 +52,11 @@ const options = {
 const swaggerSpec = swaggerJSDoc(options);
 
 // Serve Swagger UI
-app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use(
+  "/api/docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, { explorer: true })
+);
 
 // User Route
 app.use("/api/auth", UserRoutes);

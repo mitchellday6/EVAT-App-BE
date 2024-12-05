@@ -9,8 +9,38 @@ const userController = new UserController(userService);
 
 /**
  * @swagger
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:        
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT   
+ *   schemas:
+ *     UserItemResponse:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *         email:
+ *           type: string
+ *         fullName:
+ *           type: string
+ *         role:
+ *           type: string
+ */
+
+/**
+ * @swagger
+ * security:
+ *   - bearerAuth: []
+ */
+
+/**
+ * @swagger
  * /api/auth/register:
  *   post:
+ *     tags:
+ *       - Authentication
  *     summary: Register a new user
  *     description: Register a new user
  *     requestBody:
@@ -23,7 +53,7 @@ const userController = new UserController(userService);
  *               fullName:
  *                 type: string
  *                 example: "Milly"
- *               username:
+ *               email:
  *                 type: string
  *                 example: "example@deakin.edu.au"
  *               password:
@@ -32,8 +62,25 @@ const userController = new UserController(userService);
  *     responses:
  *       201:
  *         description: User registered successfully
- *       401:
- *         description: Invalid request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "User registered successfully"
+ *                 data:
+ *                   type: object
+ *       400:
+ *         description: Bad request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
  */
 router.post("/register", (req, res) => userController.register(req, res));
 
@@ -41,6 +88,8 @@ router.post("/register", (req, res) => userController.register(req, res));
  * @swagger
  * /api/auth/login:
  *   post:
+ *     tags:
+ *       - Authentication
  *     summary: Login
  *     description: Log in by providing email and password.
  *     requestBody:
@@ -59,15 +108,103 @@ router.post("/register", (req, res) => userController.register(req, res));
  *     responses:
  *       200:
  *         description: Successfully logged in
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Login successful"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     accessToken:
+ *                       type: string
  *       401:
  *         description: Invalid credentials
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
  */
 router.post("/login", (req, res) => userController.login(req, res));
 
-// Protected routes
+/**
+ * @swagger
+ * /api/auth/profile:
+ *   get:
+ *     tags:
+ *       - User
+ *     summary: Get user profile including id, fullName, email, role
+ *     description: Get the profile of the currently authenticated user
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved user profile
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "success"
+ *                 data:
+ *                   $ref: '#/components/schemas/UserItemResponse'
+ *       401:
+ *         description: Unauthorized - Invalid or missing token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Unauthorized"
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Server error
+ */
 router.get("/profile", authGuard(["user", "admin"]), (req, res) =>
   userController.getUserById(req, res)
 );
+
+/**
+ * @swagger
+ * /api/auth/user-list:
+ *   get:
+ *     tags:
+ *       - Admin
+ *     summary: Get all users
+ *     description: Get a list of all users (admin only)
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved user list
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "success"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/UserItemResponse'
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
+ */
 router.get("/user-list", authGuard(["admin"]), (req, res) =>
   userController.getAllUser(req, res)
 );
