@@ -1,5 +1,4 @@
-# Build stage
-FROM node:18-alpine as builder
+FROM node:18-alpine
 
 WORKDIR /app
 
@@ -7,16 +6,13 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm install --production
 
 # Copy source code and TypeScript config
 COPY . .
 
 # Build TypeScript code
 RUN npm run build && ls -la
-
-# Copy built files from builder stage
-COPY --from=builder /app/build ./build
 
 # Expose the port the app runs on
 EXPOSE 8080
