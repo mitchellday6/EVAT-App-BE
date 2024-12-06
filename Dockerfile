@@ -27,7 +27,7 @@ RUN npm ci --only=production
 COPY . .
 
 # Copy built files from builder stage
-COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/build ./build
 
 # Expose the port the app runs on
 EXPOSE 8080
