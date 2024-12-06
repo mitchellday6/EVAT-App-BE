@@ -13,6 +13,7 @@ dotenv.config();
 
 const app: Application = express();
 const PORT = process.env.PORT || 8080;
+const DOMAIN_URL = process.env.DOMAIN_URL || "http://localhost";
 
 connectDB();
 
@@ -43,7 +44,7 @@ const options = {
         bearerAuth: [],
       },
     ],
-    servers: [{ url: `http://localhost:${PORT}` }],
+    servers: [{ url: `${DOMAIN_URL}:${PORT}` }],
   },
   apis: ["./src/routes/*.ts", "./src/routes/*.js"],
 };
@@ -68,6 +69,6 @@ app.use(notFound);
 app.use(errorHandler);
 
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-  console.log(`Swagger UI is available on http://localhost:${PORT}/api/docs`);
+  console.log(`Server is running on ${DOMAIN_URL}:${PORT}`);
+  console.log(`Swagger UI is available on ${DOMAIN_URL}:${PORT}/api/docs`);
 });
