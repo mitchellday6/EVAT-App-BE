@@ -7,24 +7,13 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci
+RUN npm install
 
 # Copy source code and TypeScript config
 COPY . .
 
 # Build TypeScript code
-RUN npm run build
-
-# Production stage
-FROM node:18-alpine
-
-WORKDIR /app
-
-# Copy package files and install production dependencies
-COPY package*.json ./
-RUN npm ci --only=production
-
-COPY . .
+RUN npm run build && ls -la
 
 # Copy built files from builder stage
 COPY --from=builder /app/build ./build
