@@ -7,15 +7,13 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci
+RUN yarn ci
 
 # Copy source code and TypeScript config
-COPY server.ts ./
-COPY tsconfig.json ./
-COPY src ./src
+COPY . .
 
 # Build TypeScript code
-RUN npm run build
+RUN yarn run build
 
 # Production stage
 FROM node:18-alpine
@@ -24,7 +22,9 @@ WORKDIR /app
 
 # Copy package files and install production dependencies
 COPY package*.json ./
-RUN npm ci --only=production
+RUN yarn ci --only=production
+
+COPY . .
 
 # Copy built files from builder stage
 COPY --from=builder /app/dist ./dist
