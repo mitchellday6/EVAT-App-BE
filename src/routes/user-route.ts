@@ -11,10 +11,10 @@ const userController = new UserController(userService);
  * @swagger
  * components:
  *   securitySchemes:
- *     bearerAuth:        
+ *     bearerAuth:
  *       type: http
  *       scheme: bearer
- *       bearerFormat: JWT   
+ *       bearerFormat: JWT
  *   schemas:
  *     UserItemResponse:
  *       type: object
@@ -132,6 +132,54 @@ router.post("/register", (req, res) => userController.register(req, res));
  *                   type: string
  */
 router.post("/login", (req, res) => userController.login(req, res));
+
+/**
+ * @swagger
+ * /api/auth/refresh-token:
+ *   post:
+ *     tags:
+ *       - Authentication
+ *     summary: Refresh Access Token
+ *     description: Get a new access token using refresh token
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *                 example: "eyJhbGciOiJIUzI1NiIs..."
+ *     responses:
+ *       200:
+ *         description: Successfully refreshed token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Token refreshed successfully"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     accessToken:
+ *                       type: string
+ *       401:
+ *         description: Invalid refresh token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ */
+router.post("/refresh-token", (req, res) =>
+  userController.refreshToken(req, res)
+);
 
 /**
  * @swagger

@@ -36,6 +36,28 @@ export default class UserController {
     }
   }
 
+  async refreshToken(req: Request, res: Response): Promise<Response> {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      return res.status(400).json({ message: "Refresh token is required" });
+    }
+
+    try {
+      const { accessToken } = await this.userService.refreshAccessToken(
+        refreshToken
+      );
+      return res.status(200).json({
+        message: "Token refreshed successfully",
+        data: {
+          accessToken,
+        },
+      });
+    } catch (error: any) {
+      return res.status(401).json({ message: error.message });
+    }
+  }
+
   // Get user by ID
   async getUserById(req: Request, res: Response): Promise<Response> {
     const { user } = req;
