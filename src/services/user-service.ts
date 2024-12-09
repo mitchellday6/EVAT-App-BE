@@ -2,6 +2,7 @@ import User from "../models/user-model";
 import UserRepository from "../repositories/user-repository";
 import bcrypt from "bcryptjs";
 import generateToken from "../utils/generate-token";
+import jwt from "jsonwebtoken";
 
 export default class UserService {
   // Register a new user
@@ -38,28 +39,102 @@ export default class UserService {
     }
   }
 
-  async authenticate(email: string, password: string): Promise<string> {
+  async authenticate(
+    email: string,
+    password: string
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     try {
       const existingUser = await UserRepository.findByEmail(email);
       if (existingUser) {
         if (bcrypt.compareSync(password, existingUser.password)) {
-          // Generate JWT token
-          const token = generateToken(existingUser);
-          // Return both user and token
-          return token;
+          // Generate tokens
+          const accessToken = generateToken(existingUser, "1h");
+          const refreshToken = generateToken(existingUser, "1d");
+
+          // Save refresh token to database
+          const refreshTokenExpiresAt = new Date(
+            Date.now() + 24 * 60 * 60 * 1000
+          ); // 1 day from now
+          await UserRepository.updateRefreshToken(
+            existingUser.id,
+            refreshToken,
+            refreshTokenExpiresAt
+          );
+
+          return {
+            accessToken,
+            refreshToken,
+          };
         } else {
-          throw new Error(`Invalid password for email = [${email}] `);
+          throw new Error(`Invalid password for email = [${email}]`);
         }
       } else {
         throw new Error(`The account with email = [${email}] does not exist`);
       }
     } catch (e: unknown) {
-      // Safely handle error if it's an instance of Error
       if (e instanceof Error) {
         throw new Error("Authentication failed: " + e.message);
       } else {
         throw new Error("An unknown error occurred during authentication.");
       }
+    }
+  }
+
+  async refreshAccessToken(
+    refreshToken: string
+  ): Promise<{ accessToken: string; refreshToken: string }> {
+    try {
+      // Verify the refresh token
+      const secret = process.env.JWT_SECRET;
+      if (!secret) {
+        throw new Error("JWT_SECRET is not defined");
+      }
+
+      const decoded = jwt.verify(
+        refreshToken,
+        process.env.JWT_SECRET as string
+      ) as {
+        id: string;
+        email: string;
+        role: string;
+      };
+
+      // Find user and check if refresh token is valid
+      const user = await UserRepository.findById(decoded.id);
+
+      if (!user || user.refreshToken !== refreshToken) {
+        throw new Error("Invalid refresh token");
+      }
+
+      // Check if refresh token is expired
+      if (
+        user.refreshTokenExpiresAt &&
+        user.refreshTokenExpiresAt < new Date()
+      ) {
+        throw new Error("Refresh token has expired");
+      }
+
+      // Generate new tokens
+      const newAccessToken = generateToken(user, "1h");
+      const newRefreshToken = generateToken(user, "1d");
+
+      // Update refresh token in database
+      const refreshTokenExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      await UserRepository.updateRefreshToken(
+        user.id,
+        newRefreshToken,
+        refreshTokenExpiresAt
+      );
+
+      return {
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      };
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error("Failed to refresh token: " + error.message);
+      }
+      throw new Error("An unknown error occurred while refreshing token");
     }
   }
 

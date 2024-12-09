@@ -33,6 +33,21 @@ class UserRepository {
   async delete(filter: FilterQuery<IUser>): Promise<IUser | null> {
     return await User.findOneAndDelete(filter).exec();
   }
+
+  async updateRefreshToken(
+    userId: string,
+    refreshToken: string | null,
+    expiresAt: Date | null
+  ) {
+    return await User.findByIdAndUpdate(
+      userId,
+      {
+        refreshToken,
+        refreshTokenExpiresAt: expiresAt,
+      },
+      { new: true }
+    );
+  }
 }
 
 export default new UserRepository();
