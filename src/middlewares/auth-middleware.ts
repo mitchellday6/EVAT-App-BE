@@ -19,7 +19,7 @@ export const authGuard = (allowedRoles: string[]) => {
 
       // Extract token
       const token = authHeader.split(" ")[1];
-
+      
       // Verify token
       const decoded = jwt.verify(
         token,
