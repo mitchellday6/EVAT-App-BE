@@ -7,6 +7,7 @@ import { notFound, errorHandler } from "./src/middlewares/error-middleware";
 import UserRoutes from "./src/routes/user-route";
 import ProfileRoutes from "./src/routes/profile-route";
 import VehicleRoutes from "./src/routes/vehicle-route";
+import StationRoutes from "./src/routes/station-route";
 import cors from "cors";
 
 dotenv.config();
@@ -63,6 +64,7 @@ app.use(
 app.use("/api/auth", UserRoutes);
 app.use("/api/profile", ProfileRoutes);
 app.use("/api/vehicle", VehicleRoutes);
+app.use("/api/station", StationRoutes);
 
 // Middleware
 app.use(notFound);
