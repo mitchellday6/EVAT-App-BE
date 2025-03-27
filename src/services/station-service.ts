@@ -1,6 +1,10 @@
 import ChargingStationRepository from "../repositories/station-repository";
 
 export default class ChargingStationService {
+ async getAllStations() {
+  return await ChargingStationRepository.findAll();
+ }
+
   async getStationById(stationId: string) {
     return await ChargingStationRepository.findById(stationId);
   }

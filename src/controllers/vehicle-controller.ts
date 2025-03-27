@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import VehicleService from "../services/vehicle-service";
 
-export default class ProfileController {
+export default class ProfileController { //todo rename to something like "VehicleController"
   constructor(private readonly vehicleService: VehicleService) {}
 
   async getVehicleById(req: Request, res: Response): Promise<Response> {
