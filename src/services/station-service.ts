@@ -12,4 +12,8 @@ export default class ChargingStationService {
   async getStationsWithIdIn(stationIds: string[]) {
     return await ChargingStationRepository.findByIdIn(stationIds);
   }
+
+  async getNearestStation(lat: number, lon: number) {
+    return await ChargingStationRepository.findNearest(lat, lon)
+  }
 }

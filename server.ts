@@ -60,11 +60,15 @@ app.use(
   swaggerUi.setup(swaggerSpec, { explorer: true })
 );
 
+app.get("/api-docs/json", (req, res) => {
+  res.json(swaggerSpec);
+});
+
 // User Route
 app.use("/api/auth", UserRoutes);
 app.use("/api/profile", ProfileRoutes);
 app.use("/api/vehicle", VehicleRoutes);
-app.use("/api/station", StationRoutes);
+app.use("/api/chargers", StationRoutes); // As laid out in teams https://teams.microsoft.com/l/message/19:7206bda1ca594fa2a18709af5d9fb718@thread.v2/1743116771178?context=%7B%22contextType%22%3A%22chat%22%7D
 
 // Middleware
 app.use(notFound);

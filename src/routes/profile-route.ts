@@ -18,6 +18,8 @@ const profileController = new ProfileController(
   stationService
 );
 
+//todo fix chargers schema
+
 /**
  * @swagger
  * components:
