@@ -9,6 +9,8 @@ import ProfileRoutes from "./src/routes/profile-route";
 import VehicleRoutes from "./src/routes/vehicle-route";
 import StationRoutes from "./src/routes/station-route";
 import cors from "cors";
+import NavigationRoutes from "./src/routes/navigation-route";
+
 
 dotenv.config();
 
@@ -65,6 +67,7 @@ app.use("/api/auth", UserRoutes);
 app.use("/api/profile", ProfileRoutes);
 app.use("/api/vehicle", VehicleRoutes);
 app.use("/api/station", StationRoutes);
+app.use("/navigation", NavigationRoutes);
 
 // Middleware
 app.use(notFound);
