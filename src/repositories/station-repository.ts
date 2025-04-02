@@ -15,6 +15,19 @@ class ChargingStationRepository {
       _id: { $in: stationIds },
     });
   }
+
+  async findNearest(lat: number, lon: number): Promise<IChargingStation | null> {
+    return await ChargingStation.findOne({
+      location: {
+        $nearSphere: {
+          $geometry: {
+            type: "Point",
+            coordinates: [lon, lat],
+          },
+        },
+      },
+    }).exec();
+  }
 }
 
 export default new ChargingStationRepository();

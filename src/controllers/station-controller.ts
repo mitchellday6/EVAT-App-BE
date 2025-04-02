@@ -27,7 +27,22 @@ export default class StationController {
 
             return res.status(200).json({
                 message: "success",
-                data: existingStation,
+                data: existingStation
+            });
+        } catch (error: any) {
+            return res.status(400).json({ message: error.message });
+        }
+    }
+
+    async getNearestStation(req: Request, res: Response): Promise<Response> {
+        const {lat, lon} = req.query;
+        try{
+            const nearestStation = await this.stationService.getNearestStation(
+                Number(lat), Number(lon) // Parameters are given as string but need to be numbers
+            )
+            return res.status(200).json({
+                message: "success",
+                data: nearestStation
             });
         } catch (error: any) {
             return res.status(400).json({ message: error.message });
