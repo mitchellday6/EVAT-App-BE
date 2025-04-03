@@ -1,12 +1,25 @@
 import { Request, Response } from "express";
+import { ParsedQs } from 'qs'; // Needed for the query parameters
 import ChargingStationService from "../services/station-service";
 
 export default class StationController {
     constructor(private readonly stationService: ChargingStationService) {}
 
     async getAllStations(req: Request, res: Response): Promise<Response> {
+        const { connector } = req.query;
+
+        let connectorArray: string[] = [];
+        if (typeof connector === 'string') {
+            connectorArray = connector.split(",").map(item => item.trim());
+        }
+
+        console.log(typeof(connector));
+        console.log(typeof(connectorArray));
+        console.log(connector);
+        console.log(connectorArray);
+        
         try {
-            const existingStations = await this.stationService.getAllStations();
+            const existingStations = await this.stationService.getAllStations(connectorArray);
             
             return res.status(200).json({
                 message: "success",

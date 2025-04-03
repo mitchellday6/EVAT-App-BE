@@ -17,6 +17,13 @@ const stationController = new StationController(stationService);
  *     description: Retrieve a list of all chargers
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: connector
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: Connectors to filter for by comma seperated string.
  *     responses:
  *       200:
  *         description: Successfully retrieved chargers list
