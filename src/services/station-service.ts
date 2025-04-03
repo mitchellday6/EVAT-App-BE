@@ -16,4 +16,8 @@ export default class ChargingStationService {
   async getNearestStation(lat: number, lon: number) {
     return await ChargingStationRepository.findNearest(lat, lon)
   }
+
+  async getByRadius(lat: number, lon: number, radiusKm: number) {
+    return await ChargingStationRepository.findWithinRadius(lat, lon, radiusKm)
+  }
 }
