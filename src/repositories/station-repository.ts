@@ -1,8 +1,4 @@
 import ChargingStation, { IChargingStation } from "../models/station-model";
-<<<<<<< HEAD
-
-class ChargingStationRepository {
-=======
 import { FilterQuery } from "mongoose";
 
 class ChargingStationRepository {
@@ -10,7 +6,6 @@ class ChargingStationRepository {
     return await ChargingStation.find(filter).exec();
   }
 
->>>>>>> 2ef7dcf44cf11a3a99ca9907205f20bee56614bb
   async findById(stationId: string): Promise<IChargingStation | null> {
     return await ChargingStation.findById(stationId).exec();
   }
@@ -20,8 +15,6 @@ class ChargingStationRepository {
       _id: { $in: stationIds },
     });
   }
-<<<<<<< HEAD
-=======
 
   async findNearest(lat: number, lon: number): Promise<IChargingStation | null> {
     return await ChargingStation.findOne({
@@ -35,7 +28,6 @@ class ChargingStationRepository {
       },
     }).exec();
   }
->>>>>>> 2ef7dcf44cf11a3a99ca9907205f20bee56614bb
 }
 
 export default new ChargingStationRepository();
