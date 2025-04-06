@@ -11,8 +11,15 @@ export default class ProfileController {
     private readonly profileService: ProfileService,
     private readonly vehicleService: VehicleService,
     private readonly stationService: ChargingStationService
-  ) {}
+  ) { }
 
+  /**
+   * Handles a request to get an authenticated user's profile 
+   * 
+   * @param req Request object containing the authenticated user
+   * @param res Response object used to send back the HTTP response
+   * @returns Returns the status code, a relevant message, and the data if the request was successful 
+   */
   async getUserProfile(req: Request, res: Response): Promise<Response> {
     const { user } = req;
 
@@ -49,6 +56,14 @@ export default class ProfileController {
     }
   }
 
+
+  /**
+   * Handles a request to update the authenticated user's vehicle model 
+   * 
+   * @param req Request object containing the authenticated user and the vehicleId
+   * @param res Response object used to send back the HTTP response
+   * @returns Returns the status code, a relevant message, and the data if the request was successful 
+   */
   async updateUserVehicleModel(req: Request, res: Response): Promise<Response> {
     const { vehicleId } = req.body;
     const { user } = req;
@@ -80,6 +95,14 @@ export default class ProfileController {
     }
   }
 
+
+  /**
+   * Function to add a favourite charging station to a user
+   * 
+   * @param req Request object containing the authenticated user and the station ID
+   * @param res Response object used to send back the HTTP response
+   * @returns Returns the status code, a relevant message, and the data if the request was successful 
+   */
   async addFavouriteStation(req: Request, res: Response): Promise<Response> {
     const { stationId } = req.body;
     const { user } = req;
@@ -111,6 +134,14 @@ export default class ProfileController {
     }
   }
 
+
+  /**
+   * Function to remove a favourite charging station to a user
+   * 
+   * @param req Request object containing the authenticated user and the station ID
+   * @param res Response object used to send back the HTTP response
+   * @returns Returns the status code, a relevant message, and the data if the request was successful 
+   */
   async deleteFavouriteStation(req: Request, res: Response): Promise<Response> {
     const { stationId } = req.body;
     const { user } = req;
