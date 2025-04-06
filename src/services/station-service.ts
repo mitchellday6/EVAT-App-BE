@@ -17,7 +17,6 @@ function escapeRegex(text: string): string {
 export default class ChargingStationService {
   async getAllStations(options: StationFilterOptions) {
 
-
     const query: FilterQuery<any> = {};
   
     if (options.connectorTypes?.length) {
@@ -70,7 +69,40 @@ export default class ChargingStationService {
     return await ChargingStationRepository.findByIdIn(stationIds);
   }
 
-  async getNearestStation(lat: number, lon: number) {
-    return await ChargingStationRepository.findNearest(lat, lon)
+  async getNearestStation(options: StationFilterOptions) {
+    const query: FilterQuery<any> = {};
+  
+    if (options.connectorTypes?.length) {
+      query.connection_type = {
+        $in: makeFlexibleRegexList(options.connectorTypes),
+      };
+    }
+  
+    if (options.chargingCurrents?.length) {
+      query.current_type = {
+        $in: makeFlexibleRegexList(options.chargingCurrents),
+      };
+    }
+  
+    if (options.operators?.length) {
+      query.operator = {
+        $in: makeFlexibleRegexList(options.operators),
+      };
+    }
+  
+    if (
+      options.location?.latitude !== undefined &&
+      options.location?.longitude !== undefined
+    ) {
+      query.location = {
+        $nearSphere: {
+          $geometry: {
+            type: "Point",
+            coordinates: [options.location.longitude, options.location.latitude],
+          },
+        },
+      };
+    }
+    return await ChargingStationRepository.findNearest(query);
   }
 }

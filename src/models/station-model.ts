@@ -7,11 +7,11 @@ export interface StationFilterOptions {
   location?: {
     longitude: number;
     latitude: number;
-    radiusKm: number;
+    radiusKm?: number;
   };
 }
 
-export interface IChargingStation extends Document {
+export interface IChargingStation {
   cost?: string;
   charging_points?: number;
   pay_at_location?: string;
@@ -64,7 +64,9 @@ const ChargingStationSchema: Schema = new Schema<IChargingStation>(
 
 ChargingStationSchema.index({ location: '2dsphere' });
 
-const ChargingStation = mongoose.model<IChargingStation>(
+export interface IChargingStationDocument extends IChargingStation, Document {}
+
+const ChargingStation = mongoose.model<IChargingStationDocument>(
   "ChargingStation",
   ChargingStationSchema,
   "charging_stations"

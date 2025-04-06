@@ -130,45 +130,106 @@ router.get("/", authGuard(["user", "admin"]), (req, res) =>
 
 /**
  * @swagger
- * /api/chargers/nearest-charger:
- *   get:
- *     tags:
- *       - Chargers
- *     summary: Get nearest charger
- *     description: Retrieves the nearest charger
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: query
- *         name: lat
- *         schema:
- *           type: number
- *         required: true
- *         description: Latitude of the user's location.
- *       - in: query
- *         name: lon
- *         schema:
- *           type: number
- *         required: true
- *         description: Longitude of the user's location.
- *     responses:
- *       200:
- *         description: Successfully retrieved chargers list
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "success"
- *                 data:
- *                   type: object
- *                   $ref: '#/components/schemas/ChargingStation'
- *       401:
- *         description: Unauthorized
- *       500:
- *         description: Server error
+{
+ *      "/api/chargers/nearest-charger": {
+ *          "get": {
+ *              "tags": [
+ *                  "Chargers"
+ *              ],
+ *              "summary": "Get nearest charger",
+ *              "description": "Retrieves the nearest charger",
+ *              "security": [
+ *                  {
+ *                      "bearerAuth": []
+ *                  }
+ *              ],
+ *              "parameters": [
+ *                  {
+ *                      "in": "query",
+ *                      "name": "connector",
+ *                      "schema": {
+ *                          "type": "string"
+ *                      },
+ *                      "required": false,
+ *                      "description": "Connectors to filter for.<br>
+ *                                     Exact matches.<br>
+ *                                     Allows comma-separated string."
+ *                  },
+ *                  {
+ *                      "in": "query",
+ *                      "name": "current",
+ *                      "schema": {
+ *                          "type": "string"
+ *                      },
+ *                      "required": false,
+ *                      "description": "Current type to filter for.<br>
+ *                                     Accepts 'AC' ('AC (Single-Phase)'), 'AC3' ('AC (Three-Phase)'), and 'DC'.<br>
+ *                                     Allows comma-separated string."
+ *                  },
+ *                  {
+ *                      "in": "query",
+ *                      "name": "operator",
+ *                      "schema": {
+ *                          "type": "string"
+ *                      },
+ *                      "required": false,
+ *                      "description": "Operators to filter for.<br>
+ *                              Exact matches.<br>
+ *                              Allows comma-separated string."
+ *                  },
+ *                  {
+ *                      "in": "query",
+ *                      "name": "lat",
+ *                      "schema": {
+ *                          "type": "number"
+ *                      },
+ *                      "required": true,
+ *                      "description": "Latitude of search location."
+ *                  },
+ *                  {
+ *                      "in": "query",
+ *                      "name": "lon",
+ *                      "schema": {
+ *                          "type": "number"
+ *                      },
+ *                      "required": true,
+ *                      "description": "Longitude of search location."
+ *                  }
+ *              ],
+ *              "responses": {
+ *                  "200": {
+ *                      "description": "Successfully retrieved chargers list",
+ *                      "content": {
+ *                          "application/json": {
+ *                              "schema": {
+ *                                  "type": "object",
+ *                                  "properties": {
+ *                                      "message": {
+ *                                          "type": "string",
+ *                                          "example": "success"
+ *                                      },
+ *                                      "data": {
+ *                                          "type": "object",
+ *                                          "$ref": "#/components/schemas/ChargingStation"
+ *                                      }
+ *                                  }
+ *                              }
+ *                          }
+ *                      }
+ *                  },
+ *                  "400": {
+ *                    "description": "Invalid parameter(s)"
+ *                  },
+ *                  "401": {
+ *                      "description": "Unauthorized"
+ *                  },
+ *                  "500": {
+ *                      "description": "Server error"
+ *                  }
+ *              }
+ *          }
+ *      }
+ *  }
  */
 router.get("/nearest-charger", authGuard(['user', 'admin']), (req, res) =>
     stationController.getNearestStation(req, res)
