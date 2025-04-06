@@ -7,10 +7,11 @@ import { notFound, errorHandler } from "./src/middlewares/error-middleware";
 import UserRoutes from "./src/routes/user-route";
 import ProfileRoutes from "./src/routes/profile-route";
 import VehicleRoutes from "./src/routes/vehicle-route";
+import adminRoutes from './src/routes/admin-route';
+import adminAuthRoutes from './src/routes/admin-auth-route';
 import StationRoutes from "./src/routes/station-route";
 import cors from "cors";
 import NavigationRoutes from "./src/routes/navigation-route";
-
 
 dotenv.config();
 
@@ -19,6 +20,19 @@ const PORT = process.env.PORT || 8080;
 const DOMAIN_URL = process.env.DOMAIN_URL || "http://localhost";
 
 connectDB();
+
+import Admin from './src/models/admin';
+
+const createDefaultAdmin = async () => {
+  const existingAdmin = await Admin.findOne({});
+  if (!existingAdmin) {
+    await Admin.create({ username: 'admin', password: 'admin' });
+    console.log('✅ Default admin created');
+  }
+};
+
+createDefaultAdmin();
+
 
 app.use(cors());
 app.use(express.json());
@@ -62,11 +76,18 @@ app.use(
   swaggerUi.setup(swaggerSpec, { explorer: true })
 );
 
+
+app.get("/api-docs/json", (req, res) => {
+  res.json(swaggerSpec);
+});
+
 // User Route
 app.use("/api/auth", UserRoutes);
 app.use("/api/profile", ProfileRoutes);
 app.use("/api/vehicle", VehicleRoutes);
-app.use("/api/station", StationRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/admin-auth', adminAuthRoutes);
+app.use("/api/chargers", StationRoutes); // As laid out in teams https://teams.microsoft.com/l/message/19:7206bda1ca594fa2a18709af5d9fb718@thread.v2/1743116771178?context=%7B%22contextType%22%3A%22chat%22%7D
 app.use("/navigation", NavigationRoutes);
 
 // Middleware

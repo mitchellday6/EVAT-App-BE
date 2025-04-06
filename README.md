@@ -16,7 +16,13 @@ Create a .env file in then root and add the following
 
 ```
 PORT = 8080
-MONGODB_URI = mongodb://<<address>>:<<port>>
+<<<<<<< HEAD
+MONGODB_URI = MongoDB Uri
+JWT_SECRET = 'abc123'
+```
+
+=======
+MONGODB_URI = mongodb://<<address>>:<<port>>/EVAT
 JWT_SECRET = 'abc123'
 ```
 
@@ -41,13 +47,15 @@ https://www.mongodb.com/lp/cloud/atlas/try4-reg?utm_source=google&utm_campaign=s
 
 https://www.mongodb.com/resources/basics/databases/free 
 
-
+## Ensure MongoDB has the correct data and schema for chargers
+https://gist.github.com/EscWasTaken/3f08797d7470237ae3c2ed0dd149aace
 
 ## MongoDB Compass 
 A great tool for connecting, testing, editing, exporting and importing data into mongo databases.
 
 https://www.mongodb.com/products/tools/compass 
 
+>>>>>>> 2ef7dcf44cf11a3a99ca9907205f20bee56614bb
 ## Install Dependencies
 
 ```
@@ -63,6 +71,9 @@ npm install
 
 npm run server
 
+<<<<<<< HEAD
+```
+=======
 ```
 
 # MORE INFORMATION REQUIRED
@@ -73,3 +84,4 @@ npm run server
 
 Bearer is correct when checking in code.
 
+>>>>>>> 2ef7dcf44cf11a3a99ca9907205f20bee56614bb

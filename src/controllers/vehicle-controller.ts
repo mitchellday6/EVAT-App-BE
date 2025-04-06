@@ -1,7 +1,11 @@
 import { Request, Response } from "express";
 import VehicleService from "../services/vehicle-service";
 
+<<<<<<< HEAD
+export default class ProfileController {
+=======
 export default class ProfileController { //todo rename to something like "VehicleController"
+>>>>>>> 2ef7dcf44cf11a3a99ca9907205f20bee56614bb
   constructor(private readonly vehicleService: VehicleService) {}
 
   async getVehicleById(req: Request, res: Response): Promise<Response> {

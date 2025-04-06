@@ -13,6 +13,13 @@ export interface IChargingStation extends Document {
   connection_type?: string;
   current_type?: string;
   charging_points_flag?: number;
+<<<<<<< HEAD
+=======
+  location: {
+    type: string;
+    coordinates: [number, number]; // [latitude, longitude]
+  };
+>>>>>>> 2ef7dcf44cf11a3a99ca9907205f20bee56614bb
 }
 
 const ChargingStationSchema: Schema = new Schema<IChargingStation>(
@@ -29,6 +36,20 @@ const ChargingStationSchema: Schema = new Schema<IChargingStation>(
     connection_type: { type: String },
     current_type: { type: String },
     charging_points_flag: { type: Number },
+<<<<<<< HEAD
+=======
+    location: {
+      type: {
+        type: String,
+        enum: ['Point'],
+        required: true,
+      },
+      coordinates: {
+        type: [Number], // [latitude, longitude]
+        required: true,
+      },
+    }
+>>>>>>> 2ef7dcf44cf11a3a99ca9907205f20bee56614bb
   },
   {
     timestamps: true, // Automatically add createdAt and updatedAt fields
@@ -36,6 +57,11 @@ const ChargingStationSchema: Schema = new Schema<IChargingStation>(
   }
 );
 
+<<<<<<< HEAD
+=======
+ChargingStationSchema.index({ location: '2dsphere' });
+
+>>>>>>> 2ef7dcf44cf11a3a99ca9907205f20bee56614bb
 const ChargingStation = mongoose.model<IChargingStation>(
   "ChargingStation",
   ChargingStationSchema,
