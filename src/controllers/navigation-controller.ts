@@ -42,17 +42,19 @@ export const createRouteFromPoints = async (req: Request, res: Response) => {
 export const createRouteFromSentence = async (req: Request, res: Response) => {
   try {
     const { sentence } = req.body;
-    if (!sentence) return res.status(400).json({ message: "Sentence is required." });
+    if (!sentence) {
+      return res.status(400).json({ message: "Sentence is required." });
+    }
 
-    // Gemini Pro API call using axios
+    // Gemini Pro API call using correct model
     const geminiRes = await axios.post<GeminiResponse>(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${process.env.GOOGLE_AI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=${process.env.GOOGLE_AI_API_KEY}`,
       {
         contents: [
           {
             parts: [
               {
-                text: `Extract the start location, optional stops, and destination from this sentence: "${sentence}". Return a JSON like: { "start": "...", "stops": ["..."], "destination": "..." }`
+                text: `Extract the start location, optional stops, and destination from this sentence: "${sentence}". Return only valid JSON like: { "start": "...", "stops": ["..."], "destination": "..." }`
               }
             ]
           }
@@ -70,12 +72,31 @@ export const createRouteFromSentence = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Gemini did not return valid output." });
     }
 
-    const extracted = JSON.parse(text);
+    // Clean up markdown-style response
+    const cleanText = text
+      .replace(/```json/g, "")
+      .replace(/```/g, "")
+      .trim();
 
-    if (!extracted.start || !extracted.destination) {
-      return res.status(400).json({ message: "Failed to extract start or destination from sentence." });
+    let extracted;
+    try {
+      extracted = JSON.parse(cleanText);
+    } catch (parseErr) {
+      console.error("JSON parse error:", parseErr);
+      return res.status(400).json({
+        message: "Failed to parse Gemini output as JSON",
+        raw: text,
+      });
     }
 
+    if (!extracted.start || !extracted.destination) {
+      return res.status(400).json({
+        message: "Failed to extract start or destination from sentence.",
+        extracted,
+      });
+    }
+
+    // Call Google Maps Directions API
     const directionsRes = await mapsClient.directions({
       params: {
         origin: extracted.start,
