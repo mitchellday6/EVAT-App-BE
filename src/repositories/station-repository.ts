@@ -28,22 +28,6 @@ class ChargingStationRepository {
       },
     }).exec();
   }
-
-  async findWithinRadius(lat: number, lon: number, radiusKm: number): Promise<IChargingStation[] | null> {
-    const radiusMeters = radiusKm * 1000;
-  
-    return await ChargingStation.find({
-      location: {
-        $nearSphere: {
-          $geometry: {
-            type: 'Point',
-            coordinates: [lon, lat],
-          },
-          $maxDistance: radiusMeters,
-        },
-      },
-    }).exec();
-  }
 }
 
 export default new ChargingStationRepository();

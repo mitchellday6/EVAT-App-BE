@@ -1,5 +1,16 @@
 import mongoose, { Schema, Document } from "mongoose";
 
+export interface StationFilterOptions {
+  connectorTypes?: string[];
+  chargingCurrents?: string[];
+  operators?: string[];
+  location?: {
+    longitude: number;
+    latitude: number;
+    radiusKm: number;
+  };
+}
+
 export interface IChargingStation extends Document {
   cost?: string;
   charging_points?: number;

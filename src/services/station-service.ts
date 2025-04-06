@@ -1,21 +1,66 @@
 import { FilterQuery } from "mongoose";
 import ChargingStationRepository from "../repositories/station-repository";
+import { StationFilterOptions } from "../models/station-model";
+
+
+// Helper functions
+const makeFlexibleRegexList = (values: string[]) =>
+  values.map(
+    (val) => new RegExp(`(^|,\\s*)${escapeRegex(val)}(\\s*,|$)`, 'i')
+  );
+
+function escapeRegex(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 
 export default class ChargingStationService {
-  async getAllStations(connectorArray: string[]) {
-    if (!connectorArray.length) {
-      return await ChargingStationRepository.findAll();
-    }
-    else {
-      const filterQuery: FilterQuery<{ connection_type: string }> = {
-        connection_type: {
-          $in: connectorArray.map(value => new RegExp(value, "i"))
-        }
+  async getAllStations(options: StationFilterOptions) {
+
+
+    const query: FilterQuery<any> = {};
+  
+    if (options.connectorTypes?.length) {
+      query.connection_type = {
+        $in: makeFlexibleRegexList(options.connectorTypes),
       };
-      // Creates a filter along the lines of { connection_type: { '$in': [ /Tesla/i, /CHAdeMO/i ] } }
-      return await ChargingStationRepository.findAll(filterQuery);
     }
+  
+    if (options.chargingCurrents?.length) {
+      query.current_type = {
+        $in: makeFlexibleRegexList(options.chargingCurrents),
+      };
+    }
+  
+    if (options.operators?.length) {
+      query.operator = {
+        $in: makeFlexibleRegexList(options.operators),
+      };
+    }
+  
+    if (
+      options.location?.latitude !== undefined &&
+      options.location?.longitude !== undefined &&
+      options.location?.radiusKm !== undefined
+    ) {
+      query.location = {
+        $near: {
+          $geometry: {
+            type: 'Point',
+            coordinates: [
+              options.location.longitude,
+              options.location.latitude,
+            ],
+          },
+          $maxDistance: options.location.radiusKm * 1000,
+        },
+      };
+    }
+  
+    return await ChargingStationRepository.findAll(query);
   }
+  
+
 
   async getStationById(stationId: string) {
     return await ChargingStationRepository.findById(stationId);
@@ -27,9 +72,5 @@ export default class ChargingStationService {
 
   async getNearestStation(lat: number, lon: number) {
     return await ChargingStationRepository.findNearest(lat, lon)
-  }
-
-  async getByRadius(lat: number, lon: number, radiusKm: number) {
-    return await ChargingStationRepository.findWithinRadius(lat, lon, radiusKm)
   }
 }

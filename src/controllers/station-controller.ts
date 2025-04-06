@@ -1,32 +1,75 @@
 import { Request, Response } from "express";
 import { ParsedQs } from 'qs'; // Needed for the query parameters
 import ChargingStationService from "../services/station-service";
+import { StationFilterOptions } from "../models/station-model";
 
 export default class StationController {
-    constructor(private readonly stationService: ChargingStationService) {}
+    constructor(private readonly stationService: ChargingStationService) { }
 
     async getAllStations(req: Request, res: Response): Promise<Response> {
-        const { connector } = req.query;
+        // const { connector, current, operator, lat, lon, radius } = req.query;
 
-        let connectorArray: string[] = [];
-        if (typeof connector === 'string') {
-            connectorArray = connector.split(",").map(item => item.trim());
+        // Clean input data and convert to an array
+        let connectorTypes = req.query.connector
+            ? String(req.query.connector)
+                .split(',')
+                .map((connector) => connector.trim()) // Trim spaces
+                .filter((connector) => connector !== '') // Remove any empty strings
+            : [];
+        let chargingCurrents = req.query.current
+            ? String(req.query.current)
+                .split(',')
+                .map((current) => current.trim()) // Trim spaces
+                .filter((current) => current !== '') // Remove any empty strings
+                 : [];
+        let operators = req.query.operator
+            ? String(req.query.operator)
+                .split(',')
+                .map((operator) => operator.trim()) // Trim spaces
+                .filter((operator) => operator !== '') : []; // Remove any empty strings
+
+        // Convert AC to AC (Single-Phase), AC3 to AC (Three-Phase), and replace special characters
+        chargingCurrents = chargingCurrents.map(value => {
+            if (value == "AC") { return "AC (Single-Phase)"; }
+            else if (value == "AC3") { return "AC (Three-Phase)"; }
+            else { return value; }
+        });
+
+        // Logic for checking all or none of the parameters are provided
+        let locationFilter = undefined;
+        if (req.query.lat !== undefined || req.query.lon !== undefined || req.query.radius !== undefined) {
+            // If any are defined, check if all are defined
+            if (req.query.lat === undefined || req.query.lon === undefined || req.query.radius === undefined) {
+                return res.status(400).json(
+                    { message: "One or more of lat, lon, or radius is undefined. Either all or none need to provided." });
+            }
+            // All parameters are provided
+            locationFilter = {
+                longitude: Number(req.query.lon),
+                latitude: Number(req.query.lat),
+                radiusKm: Number(req.query.radius)
+            };
         }
 
-        console.log(typeof(connector));
-        console.log(typeof(connectorArray));
-        console.log(connector);
-        console.log(connectorArray);
-        
+        console.log(connectorTypes);
+        console.log(chargingCurrents);
+        console.log(operators);
+        console.log(locationFilter);
+
         try {
-            const existingStations = await this.stationService.getAllStations(connectorArray);
-            
+            const existingStations = await this.stationService.getAllStations({
+                connectorTypes: connectorTypes,
+                chargingCurrents: chargingCurrents,
+                operators: operators,
+                location: locationFilter
+            });
+
             return res.status(200).json({
                 message: "success",
                 data: existingStations,
             });
         } catch (error: any) {
-            return res.status(400).json({ message: error.message });
+            return res.status(500).json({ message: error.message });
         }
     }
 
@@ -48,7 +91,7 @@ export default class StationController {
     }
 
     async getNearestStation(req: Request, res: Response): Promise<Response> {
-        const {lat, lon} = req.query;
+        const { lat, lon } = req.query;
         try {
             const nearestStation = await this.stationService.getNearestStation(
                 Number(lat), Number(lon) // Parameters are given as string but need to be numbers
@@ -59,23 +102,6 @@ export default class StationController {
             });
         } catch (error: any) {
             return res.status(400).json({ message: error.message });
-        }
-    }
-
-    async getByRadius(req: Request, res: Response): Promise<Response> {
-        const {lat, lon, radius} = req.query;
-        try {
-            const stations = await this.stationService.getByRadius(
-                Number(lat), Number(lon), Number(radius)
-            );
-            return res.status(200).json({
-                message: "success",
-                data: stations
-            });
-        } catch (error: any) {
-            return res.status(500).json({
-                message: error.message
-            });
         }
     }
 }
