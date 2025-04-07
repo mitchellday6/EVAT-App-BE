@@ -7,9 +7,9 @@ import { notFound, errorHandler } from "./src/middlewares/error-middleware";
 import UserRoutes from "./src/routes/user-route";
 import ProfileRoutes from "./src/routes/profile-route";
 import VehicleRoutes from "./src/routes/vehicle-route";
-import adminRoutes from './src/routes/admin-route';
-import adminAuthRoutes from './src/routes/admin-auth-route';
 import StationRoutes from "./src/routes/station-route";
+import adminAuthRoutes from "./src/routes/admin-auth-route";
+import adminRoutes from "./src/routes/admin-route";
 import cors from "cors";
 import NavigationRoutes from "./src/routes/navigation-route";
 
