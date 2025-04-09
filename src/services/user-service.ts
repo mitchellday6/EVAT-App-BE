@@ -42,7 +42,7 @@ export default class UserService {
   async authenticate(
     email: string,
     password: string
-  ): Promise<{ accessToken: string; refreshToken: string }> {
+  ): Promise<{data: any, accessToken: string; refreshToken: string }> {
     try {
       const existingUser = await UserRepository.findByEmail(email);
       if (existingUser) {
@@ -62,8 +62,9 @@ export default class UserService {
           );
 
           return {
+            data: existingUser,
             accessToken,
-            refreshToken,
+            refreshToken
           };
         } else {
           throw new Error(`Invalid password for email = [${email}]`);
@@ -144,6 +145,10 @@ export default class UserService {
 
   async getUserById(userId: string) {
     return await UserRepository.findOne({ _id: userId });
+  }
+
+  async getUserByEmail(email: string) {
+    return await UserRepository.findOne({ email });
   }
 
   // Hash password
