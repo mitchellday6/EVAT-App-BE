@@ -36,14 +36,6 @@ const profileController = new ProfileController(
  *     ChargingStation:
  *       type: object
  *       properties:
-<<<<<<< HEAD
- *         id:
- *           type: string
- *         name:
- *           type: string
- *         location:
- *           type: string
-=======
  *         _id:
  *           type: string
  *         location:
@@ -81,7 +73,6 @@ const profileController = new ProfileController(
  *           type: string
  *         charging_points_flag:
  *           type: number
->>>>>>> 2ef7dcf44cf11a3a99ca9907205f20bee56614bb
  *     UserProfile:
  *       type: object
  *       properties:

@@ -1,6 +1,7 @@
-import { Request, Response } from "express";
+import e, { Request, Response } from "express";
 import UserService from "../services/user-service";
 import { UserItemResponse } from "../dtos/user-item-response";
+
 
 export default class UserController {
   constructor(private readonly userService: UserService) {}
@@ -24,10 +25,12 @@ export default class UserController {
     const { email, password } = req.body;
 
     try {
-      const token = await this.userService.authenticate(email, password);
+      const data = await this.userService.authenticate(email, password);
+      const token = {accessToken: data.accessToken, refreshToken: data.refreshToken};
       return res.status(200).json({
         message: "Login successful",
         data: {
+          user: data.data,
           accessToken: token,
         },
       });
@@ -61,9 +64,26 @@ export default class UserController {
   // Get user by ID
   async getUserById(req: Request, res: Response): Promise<Response> {
     const { user } = req;
-
+    console.log("user", user);
     try {
       const existingUser = await this.userService.getUserById(user?.id);
+      if (!existingUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      return res.status(200).json({
+        message: "success",
+        data: new UserItemResponse(existingUser),
+      });
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message });
+    }
+  }
+
+  // Get user by ID
+  async getUserByEmail(req: Request, res: Response): Promise<Response> {
+    const {email} = req.query;
+    try {
+      const existingUser = await this.userService.getUserByEmail(email as string);
       if (!existingUser) {
         return res.status(404).json({ message: "User not found" });
       }
