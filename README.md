@@ -16,10 +16,24 @@ Create a .env file in then root and add the following
 
 ```
 PORT = 8080
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+MONGODB_URI = MongoDB Uri
+JWT_SECRET = 'abc123'
+```
+
+=======
+>>>>>>> e832768 (Initial commit with /nearby EV charger feature)
 MONGODB_URI = mongodb://<<address>>:<<port>>/EVAT
 JWT_SECRET = 'abc123'
 ```
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> e832768 (Initial commit with /nearby EV charger feature)
 ## MongoDB
 MongoDB is required to run the backend server. There are multiple ways to do this.
 
@@ -47,6 +61,10 @@ A great tool for connecting, testing, editing, exporting and importing data into
 
 https://www.mongodb.com/products/tools/compass 
 
+<<<<<<< HEAD
+=======
+>>>>>>> 2ef7dcf44cf11a3a99ca9907205f20bee56614bb
+>>>>>>> e832768 (Initial commit with /nearby EV charger feature)
 ## Install Dependencies
 
 ```
@@ -62,6 +80,12 @@ npm install
 
 npm run server
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+```
+=======
+>>>>>>> e832768 (Initial commit with /nearby EV charger feature)
 ```
 
 # MORE INFORMATION REQUIRED
@@ -72,3 +96,7 @@ npm run server
 
 Bearer is correct when checking in code.
 
+<<<<<<< HEAD
+=======
+>>>>>>> 2ef7dcf44cf11a3a99ca9907205f20bee56614bb
+>>>>>>> e832768 (Initial commit with /nearby EV charger feature)
