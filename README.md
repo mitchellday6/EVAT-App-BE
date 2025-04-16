@@ -16,17 +16,9 @@ Create a .env file in then root and add the following
 
 ```
 PORT = 8080
-<<<<<<< HEAD
-MONGODB_URI = MongoDB Uri
-JWT_SECRET = 'abc123'
-```
-
-=======
 MONGODB_URI = mongodb://<<address>>:<<port>>/EVAT
 JWT_SECRET = 'abc123'
 ```
-
-
 
 ## MongoDB
 MongoDB is required to run the backend server. There are multiple ways to do this.
@@ -55,7 +47,6 @@ A great tool for connecting, testing, editing, exporting and importing data into
 
 https://www.mongodb.com/products/tools/compass 
 
->>>>>>> 2ef7dcf44cf11a3a99ca9907205f20bee56614bb
 ## Install Dependencies
 
 ```
@@ -71,9 +62,6 @@ npm install
 
 npm run server
 
-<<<<<<< HEAD
-```
-=======
 ```
 
 # MORE INFORMATION REQUIRED
@@ -84,4 +72,3 @@ npm run server
 
 Bearer is correct when checking in code.
 
->>>>>>> 2ef7dcf44cf11a3a99ca9907205f20bee56614bb
