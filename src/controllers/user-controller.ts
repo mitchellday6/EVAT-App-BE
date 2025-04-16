@@ -6,7 +6,13 @@ import { UserItemResponse } from "../dtos/user-item-response";
 export default class UserController {
   constructor(private readonly userService: UserService) {}
 
-  // Register a new user
+  /**
+   * Registers a new user
+   * 
+   * @param req Request object containing a full name, email and password
+   * @param res Response object used to send back the HTTP response
+   * @returns Returns the status code, a relevant message, and the data object of the user if the request was successful
+   */
   async register(req: Request, res: Response): Promise<Response> {
     const { email, password, fullName } = req.body;
 
@@ -20,7 +26,14 @@ export default class UserController {
     }
   }
 
-  // Authenticate a user
+
+  /**
+   * Handles a login request
+   * 
+   * @param req Request object containing an email and a password
+   * @param res Response object used to send back the HTTP response
+   * @returns Returns the status code, a relevant message, and the data if the request was successful
+   */
   async login(req: Request, res: Response): Promise<Response> {
     const { email, password } = req.body;
 
@@ -39,6 +52,14 @@ export default class UserController {
     }
   }
 
+
+  /**
+   * Handles a request for a new access token
+   * 
+   * @param req Request object containing an AccessToken
+   * @param res Response object used to send back the HTTP response
+   * @returns Returns the status code, a relevant message and a new AcessToken 
+   */
   async refreshToken(req: Request, res: Response): Promise<Response> {
     const { refreshToken } = req.body;
 
@@ -61,7 +82,14 @@ export default class UserController {
     }
   }
 
-  // Get user by ID
+
+  /**
+   * Handles a request to get a user by ID
+   * 
+   * @param req Request object containing the User ID
+   * @param res Response object used to send back the HTTP response
+   * @returns Returns the status code, a relevant message, and the data if the request was successful   
+   */
   async getUserById(req: Request, res: Response): Promise<Response> {
     const { user } = req;
     console.log("user", user);
@@ -79,7 +107,14 @@ export default class UserController {
     }
   }
 
-  // Get user by ID
+
+  /**
+   * Handles a request to get a user by an input email
+   * 
+   * @param req Request object containing an email address
+   * @param res Response object used to send back the HTTP response
+   * @returns Returns the status code, a relevant message, and the data if the request was successful   
+   */
   async getUserByEmail(req: Request, res: Response): Promise<Response> {
     const {email} = req.query;
     try {
@@ -96,7 +131,13 @@ export default class UserController {
     }
   }
 
-  // Get user by ID
+  /**
+   * Handles a request to get all users (Admin only)
+   * 
+   * @param req --Not used in this segment--
+   * @param res Response object used to send back the HTTP response 
+   * @returns Returns the status code, a relevant message, and the data if the request was successful
+   */
   async getAllUser(req: Request, res: Response): Promise<Response> {
     try {
       const existingUsers = await this.userService.getAllUser();
