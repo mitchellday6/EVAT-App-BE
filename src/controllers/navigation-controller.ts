@@ -15,6 +15,13 @@ interface GeminiResponse {
   }[];
 }
 
+/**
+ * Creates a route from the given initial starting location, ending destination, and any along the way stops
+ * 
+ * @param req Request object containing the start, stops and destinations to visit
+ * @param res Response object used to send back the HTTP response 
+ * @returns If error: returns an error message. If successful: returns the route in a JSON format 
+ */
 export const createRouteFromPoints = async (req: Request, res: Response) => {
   try {
     const { start, stops, destination } = req.body;
@@ -39,6 +46,14 @@ export const createRouteFromPoints = async (req: Request, res: Response) => {
   }
 };
 
+
+/**
+ * Creates a route from the given text that contains the starting point, ending point and any other destinations to pass by
+ * 
+ * @param req A request object containing a string to be given to Google Gemini to extract a path from
+ * @param res Respone object used to send back the HTTP response
+ * @returns If error: returns an error message. If successful: returns the route in a JSON format
+ */
 export const createRouteFromSentence = async (req: Request, res: Response) => {
   try {
     const { sentence } = req.body;
