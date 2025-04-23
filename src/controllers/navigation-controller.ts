@@ -29,7 +29,7 @@ export const createRouteFromPoints = async (req: Request, res: Response) => {
     if (!start || !destination) {
       return res.status(400).json({ message: "Start and destination are required." });
     }
-
+    
     const response = await mapsClient.directions({
       params: {
         origin: start,
@@ -38,9 +38,9 @@ export const createRouteFromPoints = async (req: Request, res: Response) => {
         key: process.env.GOOGLE_MAPS_API_KEY!,
       },
     });
-
     res.status(200).json({ route: response.data.routes[0] });
   } catch (err: any) {
+    console.error(err);
     console.error("Directions API error:", err.message);
     res.status(500).json({ message: "Failed to get route", error: err.message });
   }

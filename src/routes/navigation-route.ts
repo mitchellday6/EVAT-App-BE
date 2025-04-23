@@ -10,7 +10,7 @@ const router = express.Router();
  *     "post": {
  *       "tags": ["Navigation"],
  *       "summary": "Create a route from points",
- *       "description": "Generates a navigation route given origin and destination coordinates",
+ *       "description": "Generates a navigation route given start and destination coordinates",
  *       "requestBody": {
  *         "required": true,
  *         "content": {
@@ -18,21 +18,21 @@ const router = express.Router();
  *             "schema": {
  *               "type": "object",
  *               "properties": {
- *                 "origin": {
+ *                 "start": {
  *                   "type": "object",
  *                   "properties": {
  *                     "lat": { "type": "number", "example": -37.8477516 },
- *                     "lon": { "type": "number", "example": 145.1139689 }
+ *                     "lng": { "type": "number", "example": 145.1139689 }
  *                   },
- *                   "required": ["lat", "lon"]
+ *                   "required": ["lat", "lng"]
  *                 },
  *                 "destination": {
  *                   "type": "object",
  *                   "properties": {
  *                     "lat": { "type": "number", "example": -37.8104952 },
- *                     "lon": { "type": "number", "example": 144.9627499 }
+ *                     "lng": { "type": "number", "example": 144.9627499 }
  *                   },
- *                   "required": ["lat", "lon"]
+ *                   "required": ["lat", "lng"]
  *                 }
  *               },
  *               "required": ["origin", "destination"]
