@@ -12,6 +12,7 @@ import adminAuthRoutes from "./src/routes/admin-auth-route";
 import adminRoutes from "./src/routes/admin-route";
 import cors from "cors";
 import NavigationRoutes from "./src/routes/navigation-route";
+import path from "path";
 
 dotenv.config();
 
@@ -89,6 +90,17 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/admin-auth', adminAuthRoutes);
 app.use("/api/chargers", StationRoutes); // As laid out in teams https://teams.microsoft.com/l/message/19:7206bda1ca594fa2a18709af5d9fb718@thread.v2/1743116771178?context=%7B%22contextType%22%3A%22chat%22%7D
 app.use("/navigation", NavigationRoutes);
+
+
+// Serve React frontend
+const buildPath = path.join(__dirname, "/build");
+app.use(express.static(buildPath));
+
+// Catch-all to serve index.html for any route (for React Router)
+app.get("*", (req, res) => {
+  res.sendFile(path.join(buildPath, "index.html"));
+});
+
 
 // Middleware
 app.use(notFound);
