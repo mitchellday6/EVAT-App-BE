@@ -3,43 +3,52 @@ import jwt from "jsonwebtoken";
 import UserRepository from "../repositories/user-repository";
 
 interface JwtPayload {
-  id: string;
-  email: string;
-  role: string;
+  id?: string;
+  email?: string;
+  role?: string;
+  admin?: boolean;
 }
 
 export const authGuard = (allowedRoles: string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // Get token from header
       const authHeader = req.headers.authorization;
       if (!authHeader || !authHeader.startsWith("Bearer ")) {
         return res.status(401).json({ message: "No token provided" });
       }
 
-      // Extract token
       const token = authHeader.split(" ")[1];
-      
-      // Verify token
-      const decoded = jwt.verify(
-        token,
-        process.env.JWT_SECRET as string
-      ) as JwtPayload;
+      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
 
-      // Check if user still exists
+      // ✅ Admin token path
+      if (decoded.admin) {
+        if (!allowedRoles.includes('admin')) {
+          return res.status(403).json({ message: "Admin not authorized for this route" });
+        }
+
+        req.user = {
+          id: 'admin',
+          email: decoded.email || 'admin@evat.com',
+          role: 'admin'
+        };
+
+        return next();
+      }
+
+      // ✅ Regular user path
+      if (!decoded.id) {
+        return res.status(401).json({ message: "Invalid token: missing user ID" });
+      }
+
       const user = await UserRepository.findById(decoded.id);
       if (!user) {
         return res.status(401).json({ message: "User no longer exists" });
       }
 
-      // Check if user has required role
       if (!allowedRoles.includes(user.role)) {
-        return res
-          .status(403)
-          .json({ message: "Not authorized to access this route" });
+        return res.status(403).json({ message: "Not authorized to access this route" });
       }
 
-      // Add user to request object
       req.user = user;
       next();
     } catch (error) {

@@ -130,7 +130,7 @@ router.get("/", authGuard(["user", "admin"]), (req, res) =>
 
 /**
  * @swagger
- *  {
+{
  *      "/api/chargers/nearest-charger": {
  *          "get": {
  *              "tags": [
@@ -236,15 +236,15 @@ router.get("/nearest-charger", authGuard(['user', 'admin']), (req, res) =>
 );
 
 /**
- * @swagger
+ * @openapi
  * {
- *     "/api/chargers/{stationId}": {
+ *     "/api/chargers/GoogleMapsChargers": {
  *         "get": {
  *             "tags": [
  *                 "Chargers"
  *             ],
- *             "summary": "Get charger by ID",
- *             "description": "Retrieves a charger by its ID",
+ *             "summary": "Get chargers from Google Maps",
+ *             "description": "Retrieves the nearest chargers. <br> Returns: types, addressComponents, attributions, currentSecondaryOpeningHours, regularSecondaryOpeningHours, containingPlaces, name, id, nationalPhoneNumber, formattedAddress, location, googleMapsUri, websiteUri, currentOpeningHours, priceLevel, displayName, evChargeOptions, utcOffsetMinutes",
  *             "security": [
  *                 {
  *                     "bearerAuth": []
@@ -252,18 +252,45 @@ router.get("/nearest-charger", authGuard(['user', 'admin']), (req, res) =>
  *             ],
  *             "parameters": [
  *                 {
- *                     "in": "path",
- *                     "name": "stationId",
+ *                     "in": "query",
+ *                     "name": "lat",
+ *                     "schema": {
+ *                         "type": "number"
+ *                     },
+ *                     "required": true,
+ *                     "description": "Latitude of search location."
+ *                 },
+ *                 {
+ *                     "in": "query",
+ *                     "name": "lon",
+ *                     "schema": {
+ *                         "type": "number"
+ *                     },
+ *                     "required": true,
+ *                     "description": "Longitude of search location."
+ *                 },
+ *                 {
+ *                     "in": "query",
+ *                     "name": "radius",
+ *                     "schema": {
+ *                         "type": "number"
+ *                     },
+ *                     "required": true,
+ *                     "description": "Radius of search location in kilometers."
+ *                 },
+ *                 {
+ *                     "in": "query",
+ *                     "name": "rank",
  *                     "schema": {
  *                         "type": "string"
  *                     },
- *                     "required": true,
- *                     "description": "Charger ID to find"
- *                 },
+ *                     "required": false,
+ *                     "description": "Ranking of search results. <br> Expects 'popularity' or 'distance'. <br> Defaults to popularity."
+ *                 }
  *             ],
  *             "responses": {
  *                 "200": {
- *                     "description": "Successfully retrieved chargers list",
+ *                     "description": "Successfully retrieved chargers from Google Maps API",
  *                     "content": {
  *                         "application/json": {
  *                             "schema": {
@@ -274,8 +301,8 @@ router.get("/nearest-charger", authGuard(['user', 'admin']), (req, res) =>
  *                                         "example": "success"
  *                                     },
  *                                     "data": {
- *                                         "type": "object",
- *                                         "$ref": "#/components/schemas/ChargingStation"
+ *                                         "type": "array",
+ *                                         "items": {}
  *                                     }
  *                                 }
  *                             }
@@ -296,8 +323,8 @@ router.get("/nearest-charger", authGuard(['user', 'admin']), (req, res) =>
  *     }
  * }
  */
-router.get("/:stationId", authGuard(["user", "admin"]), (req, res) =>
-    stationController.getStationById(req, res)
+router.get("/GoogleMapsChargers", authGuard(['user', 'admin;']), (req, res) =>
+    stationController.GetGoogleMapsStations(req, res)
 );
 
 export default router;

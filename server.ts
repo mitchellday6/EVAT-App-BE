@@ -1,6 +1,7 @@
 import express, { Application } from "express";
 import dotenv from "dotenv";
 import connectDB from "./src/config/database-config";
+import mongoose from 'mongoose';
 import swaggerUi from "swagger-ui-express";
 import swaggerJSDoc from "swagger-jsdoc";
 import { notFound, errorHandler } from "./src/middlewares/error-middleware";
@@ -11,6 +12,7 @@ import StationRoutes from "./src/routes/station-route";
 import adminAuthRoutes from "./src/routes/admin-auth-route";
 import adminRoutes from "./src/routes/admin-route";
 import cors from "cors";
+import chargerRoutes from './src/routes/charger';
 import NavigationRoutes from "./src/routes/navigation-route";
 import path from "path";
 
@@ -88,8 +90,9 @@ app.use("/api/profile", ProfileRoutes);
 app.use("/api/vehicle", VehicleRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/admin-auth', adminAuthRoutes);
-app.use("/api/chargers", StationRoutes); // As laid out in teams https://teams.microsoft.com/l/message/19:7206bda1ca594fa2a18709af5d9fb718@thread.v2/1743116771178?context=%7B%22contextType%22%3A%22chat%22%7D
-app.use("/navigation", NavigationRoutes);
+app.use('/api/chargers', StationRoutes); // As laid out in teams https://teams.microsoft.com/l/message/19:7206bda1ca594fa2a18709af5d9fb718@thread.v2/1743116771178?context=%7B%22contextType%22%3A%22chat%22%7D
+app.use("/api/navigation", NavigationRoutes);
+app.use("/api/altChargers", chargerRoutes);
 
 
 // Serve React frontend

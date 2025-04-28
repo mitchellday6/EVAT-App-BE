@@ -15,6 +15,13 @@ interface GeminiResponse {
   }[];
 }
 
+/**
+ * Creates a route from the given initial starting location, ending destination, and any along the way stops
+ * 
+ * @param req Request object containing the start, stops and destinations to visit
+ * @param res Response object used to send back the HTTP response 
+ * @returns If error: returns an error message. If successful: returns the route in a JSON format 
+ */
 export const createRouteFromPoints = async (req: Request, res: Response) => {
   try {
     const { start, stops, destination } = req.body;
@@ -22,7 +29,7 @@ export const createRouteFromPoints = async (req: Request, res: Response) => {
     if (!start || !destination) {
       return res.status(400).json({ message: "Start and destination are required." });
     }
-
+    
     const response = await mapsClient.directions({
       params: {
         origin: start,
@@ -31,14 +38,22 @@ export const createRouteFromPoints = async (req: Request, res: Response) => {
         key: process.env.GOOGLE_MAPS_API_KEY!,
       },
     });
-
     res.status(200).json({ route: response.data.routes[0] });
   } catch (err: any) {
+    console.error(err);
     console.error("Directions API error:", err.message);
     res.status(500).json({ message: "Failed to get route", error: err.message });
   }
 };
 
+
+/**
+ * Creates a route from the given text that contains the starting point, ending point and any other destinations to pass by
+ * 
+ * @param req A request object containing a string to be given to Google Gemini to extract a path from
+ * @param res Respone object used to send back the HTTP response
+ * @returns If error: returns an error message. If successful: returns the route in a JSON format
+ */
 export const createRouteFromSentence = async (req: Request, res: Response) => {
   try {
     const { sentence } = req.body;
