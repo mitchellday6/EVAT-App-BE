@@ -236,6 +236,54 @@ router.get("/nearest-charger", authGuard(['user', 'admin']), (req, res) =>
 );
 
 /**
+ * @swagger
+ * /api/chargers/{stationId}:
+ *     get:
+ *         tags:
+ *             - Chargers
+ *         summary: Get charger by ID
+ *         description: Retrieves a charger by its ID
+ *         security:
+ *             - 
+ *                 bearerAuth: []
+ *         parameters:
+ *             - 
+ *                 in: path
+ *                 name: stationId
+ *                 schema:
+ *                     type: string
+ *                 required: true
+ *                 description: Charger ID to find
+ *         responses:
+ *             '200':
+ *                 description: Successfully retrieved chargers list
+ *                 content:
+ *                     application/json:
+ *                         schema:
+ *                             type: object
+ *                             properties:
+ *                                 message:
+ *                                     type: string
+ *                                     example: success
+ *                                 data:
+ *                                     type: object
+ *                                     $ref: '#/components/schemas/ChargingStation'
+ *             '400':
+ *                 description: Invalid parameter(s)
+ *             '401':
+ *                 description: Unauthorized
+ *             '500':
+ *                 description: Server error
+ */
+router.get("/:stationId", authGuard(["user", "admin"]), (req, res) =>
+ 
+
+    stationController.getStationById(req, res)
+ 
+
+);
+
+/**
  * @openapi
  * {
  *     "/api/chargers/GoogleMapsChargers": {
