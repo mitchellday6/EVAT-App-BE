@@ -108,9 +108,9 @@ router.post(
 
     // Validate input
     if (
-      typeof latitude !== 'number' ||
-      typeof longitude !== 'number' ||
-      typeof radius !== 'number'
+      typeof Number(latitude)!== 'number' ||
+      typeof Number(longitude)!== 'number' ||
+      typeof Number(radius)!== 'number'
     ) {
       return res.status(400).json({
         success: false,
