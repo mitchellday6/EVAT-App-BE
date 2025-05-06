@@ -2,6 +2,16 @@ import Profile from "../models/profile-model";
 import ProfileRepository from "../repositories/profile-repository";
 
 export default class ProfileService {
+
+    /**
+     * Updates or creates a user profile with a selected vehicle model
+     * If the user profile doesn't exist, it creates one with the vehicle model
+     * Otherwise, it updates the existing profile's car model
+     * 
+     * @param userId The ID of the user | user_id (String), user_car_model (String), favourite_station (Array[String]), createdAt (Date), updatedAt (Date)
+     * @param vehicleId The ID of the vehicle to associate with the user
+     * @returns The created or updated profile
+     */
   async updateUserVehicleModel(
     userId: string,
     vehicleId: string
@@ -24,6 +34,15 @@ export default class ProfileService {
     }
   }
 
+    /**
+     * Adds a station to the user's list of favourite stations
+     * If the user profile doesn't exist, it creates one and adds the station to the users favourite
+     * else, it will append the station to the users list of favourite stations
+     * 
+     * @param userId The ID of the user object | user_id (String), user_car_model (String), favourite_station (Array[String]), createdAt (Date), updatedAt (Date)
+     * @param stationId The ID of the station to add to favourites
+     * @returns The updated or created profile
+     */
   async addFavouriteStation(userId: string, stationId: string): Promise<any> {
     try {
       // Check if there is an existing tracking for this userId
@@ -43,6 +62,14 @@ export default class ProfileService {
     }
   }
 
+    /**
+     * Removes a station from the user's list of favourite stations
+     * Throws an error if the user profile does not exist
+     * 
+     * @param userId The ID of the user | user_id (String), user_car_model (String), favourite_station (Array[String]), createdAt (Date), updatedAt (Date)
+     * @param stationId The ID of the station to add to favourites
+     * @returns The updated profile
+     */
   async removeFavouriteStation(
     userId: string,
     stationId: string
@@ -64,6 +91,13 @@ export default class ProfileService {
     }
   }
 
+    /**
+     * Retrieves the user's profile
+     * If it doesn't exist, return a default object with empty values
+     * 
+     * @param userId The ID of the user | user_id (String), user_car_model (String), favourite_station (Array[String]), createdAt (Date), updatedAt (Date)
+     * @returns The user profile or a default profile object
+     */
   async getUserProfile(userId: string) {
     try {
       // Check if there is an existing tracking for this userId
