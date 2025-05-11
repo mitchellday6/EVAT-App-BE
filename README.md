@@ -77,16 +77,33 @@ npm install
 
 ## Run App
 
-
-# Run in dev mode
-
 ```bash
 npm run server
 ```
+
+## Test App
+Testing of the app is done using [Jest](https://jestjs.io/).
+Ensure you have run `npm install` before anything else.
+
+All tests are to be located in the `/test` folder and separated by their files folder. An example of this is if we are writing tests for the `/src/controllers/user-controller.ts` file then the equivalent test file would be `/test/conrollers/user-controller.ts`. Some exceptions can be made for folders that only contain one piece of code such as `/src/config/database-config.ts` and `/src/utils/generate-token.ts` which can be placed in the `/test` folder.
+
+Tests are to be written with the [AAA pattern](https://medium.com/@pjbgf/title-testing-code-ocd-and-the-aaa-pattern-df453975ab80) (Arrange, Act, Assert).
+
+It is prefered to use nested [`describe()`](https://jestjs.io/docs/api#describename-fn) functions where the main `describe()` distinguishes the file being tested, and the nested `describe()` distinguishes the function being tested.
+
+Tests are written using [`test(Case: Description of what should happen)`](https://jestjs.io/docs/api#testname-fn-timeout) rather than using `it(Should do this)` for clarity reasons.
+
+To run the tests simply run
+```bash
+npm run test
+```
+and monitor the console for the test results.
+
+For more in depth test debugging and running it is recommended to use the [Jest Test Explorer](https://marketplace.visualstudio.com/items?itemName=kavod-io.vscode-jest-test-adapter) VSCode extention or similar.
 
 # MORE INFORMATION REQUIRED
 
 ## Fixes Required
 
-1. Invalid token error occuring when performing GET /api/vehicle
+1. Invalid token error occurring when performing GET /api/vehicle
 Bearer is correct when checking in code.
