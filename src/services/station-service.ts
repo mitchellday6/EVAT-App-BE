@@ -2,7 +2,6 @@ import { FilterQuery } from "mongoose";
 import ChargingStationRepository from "../repositories/station-repository";
 import { StationFilterOptions } from "../models/station-model";
 
-
 // Helper functions
 const makeFlexibleRegexList = (values: string[]) =>
   values.map(
@@ -12,7 +11,6 @@ const makeFlexibleRegexList = (values: string[]) =>
 function escapeRegex(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
-
 
 export default class ChargingStationService {
   async getAllStations(options: StationFilterOptions) {
@@ -59,8 +57,6 @@ export default class ChargingStationService {
     return await ChargingStationRepository.findAll(query);
   }
   
-
-
   async getStationById(stationId: string) {
     return await ChargingStationRepository.findById(stationId);
   }

@@ -39,7 +39,7 @@ function deg2rad(deg: number): number {
 
 /**
  * @swagger
- * /api/chargers/nearby:
+ * /api/altChargers/nearby:
  *   post:
  *     summary: Get EV charging stations near a given location
  *     description: Returns all EV chargers within a specified radius (in kilometers) based on provided latitude and longitude.
@@ -108,9 +108,9 @@ router.post(
 
     // Validate input
     if (
-      typeof latitude !== 'number' ||
-      typeof longitude !== 'number' ||
-      typeof radius !== 'number'
+      typeof Number(latitude)!== 'number' ||
+      typeof Number(longitude)!== 'number' ||
+      typeof Number(radius)!== 'number'
     ) {
       return res.status(400).json({
         success: false,
