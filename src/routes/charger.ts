@@ -8,8 +8,10 @@ interface Charger {
   _id: string;
   latitude: number | string;
   longitude: number | string;
+  connection_type?: string; // <-- Add this line
   [key: string]: any;
 }
+
 
 interface ChargerWithDistance extends Charger {
   distance: number;
@@ -102,19 +104,19 @@ function deg2rad(deg: number): number {
  */
 router.post(
   '/nearby',
-  authGuard(['user', 'admin']), // ✅ Only authenticated users (admin or user) can access
+  authGuard(['user', 'admin']),
   async (req: Request, res: Response) => {
-    const { latitude, longitude, radius } = req.body;
+    const { latitude, longitude, radius, connection_type = 'none' } = req.body;
 
-    // Validate input
-    if (
-      typeof Number(latitude)!== 'number' ||
-      typeof Number(longitude)!== 'number' ||
-      typeof Number(radius)!== 'number'
-    ) {
+    const latNum = Number(latitude);
+    const lonNum = Number(longitude);
+    const radiusNum = Number(radius);
+
+    if (isNaN(latNum) || isNaN(lonNum) || isNaN(radiusNum)) {
+
       return res.status(400).json({
         success: false,
-        message: 'latitude, longitude, and radius (in km) must be numbers.'
+        message: 'latitude, longitude, and radius (in km) must be valid numbers.'
       });
     }
 
@@ -127,30 +129,24 @@ router.post(
 
       const nearbyChargers: ChargerWithDistance[] = allChargers
         .map((charger) => {
-          const lat =
-            typeof charger.latitude === 'string'
-              ? parseFloat(charger.latitude)
-              : charger.latitude;
-          const lon =
-            typeof charger.longitude === 'string'
-              ? parseFloat(charger.longitude)
-              : charger.longitude;
+          const lat = typeof charger.latitude === 'string' ? parseFloat(charger.latitude) : charger.latitude;
+          const lon = typeof charger.longitude === 'string' ? parseFloat(charger.longitude) : charger.longitude;
 
           if (!isNaN(lat) && !isNaN(lon)) {
-            const distance = getDistanceFromLatLonInKm(
-              latitude,
-              longitude,
-              lat,
-              lon
-            );
+            const distance = getDistanceFromLatLonInKm(latNum, lonNum, lat, lon);
             return { ...charger, distance };
           }
-
           return null;
         })
-        .filter(
-          (c): c is ChargerWithDistance => !!c && c.distance <= radius
-        )
+        .filter((c): c is ChargerWithDistance => {
+          if (!c || c.distance > radiusNum) return false;
+          if (connection_type === 'none') return true;
+          return (
+            typeof c.connection_type === 'string' &&
+            c.connection_type.toLowerCase().includes(connection_type.toLowerCase())
+          );
+          
+        })
         .sort((a, b) => a.distance - b.distance);
 
       return res.status(200).json({
@@ -165,5 +161,6 @@ router.post(
     }
   }
 );
+
 
 export default router;
