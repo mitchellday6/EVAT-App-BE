@@ -9,6 +9,20 @@ const adminSchema = new mongoose.Schema({
     type: String,
     default: 'admin',
   },
+  twoFactorCode: {
+    type: String,
+    default: null,
+  },
+  twoFactorCodeExpiry: {
+    type: Date,
+    default: null,
+  },
+  email: {
+    type: String,
+    default: 'admin@example.com',
+    lowercase: true,
+    trim: true,
+  },
 });
 
 export default mongoose.model('Admin', adminSchema);

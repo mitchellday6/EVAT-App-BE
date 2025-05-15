@@ -1,23 +1,26 @@
 import express from 'express';
-import { adminLogin, updateAdminCredentials } from '../controllers/admin-auth-controller';
+import {
+  adminLogin,
+  updateAdminCredentials,
+  verifyAdmin2FA
+} from '../controllers/admin-auth-controller';
 import { isAdminAuthenticated } from '../middlewares/is-admin-auth';
 
 const router = express.Router();
-
-router.post('/login', adminLogin);
 
 /**
  * @swagger
  * tags:
  *   name: Admin Auth
- *   description: Authentication routes for admin
+ *   description: Routes for admin login and 2FA authentication
  */
 
 /**
  * @swagger
  * /api/admin-auth/login:
  *   post:
- *     summary: Admin login
+ *     summary: Admin login (Step 1)
+ *     description: Authenticates admin and sends a 2FA code to the registered email.
  *     tags: [Admin Auth]
  *     requestBody:
  *       required: true
@@ -31,16 +34,59 @@ router.post('/login', adminLogin);
  *             properties:
  *               username:
  *                 type: string
+ *                 example: admin
  *               password:
  *                 type: string
+ *                 example: admin
  *     responses:
  *       200:
- *         description: Login successful
+ *         description: Verification code sent
  *       401:
  *         description: Invalid credentials
  */
+router.post('/login', adminLogin);
 
-router.put('/update-credentials', isAdminAuthenticated, updateAdminCredentials);
+/**
+ * @swagger
+ * /api/admin-auth/verify-2fa:
+ *   post:
+ *     summary: Admin login (Step 2 - 2FA verification)
+ *     description: Verifies the 2FA code and issues a JWT if successful.
+ *     tags: [Admin Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - code
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: admin
+ *               code:
+ *                 type: string
+ *                 example: 123456
+ *     responses:
+ *       200:
+ *         description: JWT token issued
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *       403:
+ *         description: Invalid or expired 2FA code
+ *       404:
+ *         description: Admin not found
+ */
+router.post('/verify-2fa', verifyAdmin2FA);
+
 /**
  * @swagger
  * /api/admin-auth/update-credentials:
@@ -62,10 +108,10 @@ router.put('/update-credentials', isAdminAuthenticated, updateAdminCredentials);
  *                 type: string
  *     responses:
  *       200:
- *         description: Admin updated
+ *         description: Admin credentials updated
  *       401:
- *         description: Unauthorized
+ *         description: Unauthorized or token missing/invalid
  */
+router.put('/update-credentials', isAdminAuthenticated, updateAdminCredentials);
 
-
-export default router; // ✅ MUST BE HERE!
+export default router;

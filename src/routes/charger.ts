@@ -113,6 +113,7 @@ router.post(
     const radiusNum = Number(radius);
 
     if (isNaN(latNum) || isNaN(lonNum) || isNaN(radiusNum)) {
+
       return res.status(400).json({
         success: false,
         message: 'latitude, longitude, and radius (in km) must be valid numbers.'
