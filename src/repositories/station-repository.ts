@@ -26,7 +26,7 @@ class ChargingStationRepository {
   /**
    * Find multiple stations by their IDs
    * 
-   * @param stationIds An array of chargin station IDs to search for
+   * @param stationIds An array of charging station IDs to search for
    * @returns Returns a an array of charging station data which match the provided IDs
    */
   async findByIdIn(stationIds: string[]): Promise<IChargingStation[]> {
