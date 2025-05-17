@@ -164,3 +164,4 @@ router.post(
 
 
 export default router;
+export {deg2rad, getDistanceFromLatLonInKm}; // Needed for jest
