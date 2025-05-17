@@ -58,7 +58,7 @@ class UserRepository {
    * Updates a user in the database based on the filter and update data
    * 
    * @param filter A filter used to identify the user to update
-   * @param update An object containing the new fields to updae
+   * @param update An object containing the new fields to update
    * @returns Returns the updated user object if there was a change, or null if there was not a filter match
    */
   async update(
