@@ -4,6 +4,7 @@ const connectDB = async () => {
   try {
     // Define MongoDB URL with a fallback
     const mongoUrl = process.env.MONGODB_URI;
+    console.log("MongoDB URI:", mongoUrl);
 
     // Add strict type checking for the URL
     if (!mongoUrl) {

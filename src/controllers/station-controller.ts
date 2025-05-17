@@ -74,7 +74,8 @@ export default class StationController {
 
             return res.status(200).json({
                 message: "success",
-                data: existingStations,
+                count: existingStations.length,
+                data: existingStations
             });
         } catch (error: any) {
             return res.status(500).json({ message: error.message });

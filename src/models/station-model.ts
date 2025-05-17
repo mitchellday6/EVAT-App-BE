@@ -69,7 +69,7 @@ export interface IChargingStationDocument extends IChargingStation, Document {}
 const ChargingStation = mongoose.model<IChargingStationDocument>(
   "ChargingStation",
   ChargingStationSchema,
-  "charging_stations"
+  "chargers" // Collection name
 );
 
 export default ChargingStation;
