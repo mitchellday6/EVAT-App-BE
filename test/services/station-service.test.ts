@@ -7,7 +7,7 @@ jest.mock("../../src/repositories/station-repository");
 
 describe("station-service", () => {
   let service: ChargingStationService;
-  
+
   beforeEach(() => {
     jest.resetAllMocks();
     service = new ChargingStationService();
@@ -109,7 +109,7 @@ describe("station-service", () => {
           $near: {
             $geometry: {
               type: "Point",
-              coordinates: [-37.725743, 144.893414]
+              coordinates: [144.893414, -37.725743]
             },
             $maxDistance: 5000
           }
@@ -145,7 +145,7 @@ describe("station-service", () => {
           $near: {
             $geometry: {
               type: "Point",
-              coordinates: [-37.725743, 144.893414]
+              coordinates: [144.893414, -37.725743]
             },
             $maxDistance: 5000
           }
@@ -237,7 +237,7 @@ describe("station-service", () => {
           $nearSphere: {
             $geometry: {
               type: "Point",
-              coordinates: [-37.725743, 144.893414]
+              coordinates: [144.893414, -37.725743]
             }
           }
         }
@@ -271,7 +271,7 @@ describe("station-service", () => {
           $nearSphere: {
             $geometry: {
               type: "Point",
-              coordinates: [-37.725743, 144.893414]
+              coordinates: [144.893414, -37.725743]
             }
           }
         }
@@ -298,7 +298,7 @@ describe("station-service", () => {
           $nearSphere: {
             $geometry: {
               type: "Point",
-              coordinates: [-37.725743, 144.893414]
+              coordinates: [144.893414, -37.725743]
             }
           }
         }
