@@ -7,6 +7,7 @@ export interface IUser extends Document {
   role: "user" | "admin";
   refreshToken: string | null;
   refreshTokenExpiresAt: Date | null;
+  lastLogin?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -39,10 +40,14 @@ const UserSchema: Schema = new Schema<IUser>(
       type: Date,
       default: null,
     },
+    lastLogin: {
+      type: Date,
+      default: null,
+    },
   },
   {
-    timestamps: true, // Automatically add createdAt and updatedAt fields
-    versionKey: false, // Disable __v field
+    timestamps: true,
+    versionKey: false,
   }
 );
 

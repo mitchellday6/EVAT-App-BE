@@ -26,7 +26,6 @@ export default class UserController {
     }
   }
 
-
   /**
    * Handles a login request
    * 
@@ -39,7 +38,19 @@ export default class UserController {
 
     try {
       const data = await this.userService.authenticate(email, password);
-      const token = {accessToken: data.accessToken, refreshToken: data.refreshToken};
+
+      // ✅ Update lastLogin timestamp
+      const userToUpdate = await this.userService.getUserById(data.data._id);
+      if (userToUpdate) {
+        userToUpdate.lastLogin = new Date();
+        await userToUpdate.save();
+      }
+
+      const token = {
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+      };
+
       return res.status(200).json({
         message: "Login successful",
         data: {
@@ -51,7 +62,6 @@ export default class UserController {
       return res.status(401).json({ message: error.message });
     }
   }
-
 
   /**
    * Handles a request for a new access token
@@ -68,9 +78,7 @@ export default class UserController {
     }
 
     try {
-      const { accessToken } = await this.userService.refreshAccessToken(
-        refreshToken
-      );
+      const { accessToken } = await this.userService.refreshAccessToken(refreshToken);
       return res.status(200).json({
         message: "Token refreshed successfully",
         data: {
@@ -81,7 +89,6 @@ export default class UserController {
       return res.status(401).json({ message: error.message });
     }
   }
-
 
   /**
    * Handles a request to get a user by ID
@@ -106,7 +113,6 @@ export default class UserController {
       return res.status(500).json({ message: error.message });
     }
   }
-
 
   /**
    * Handles a request to get a user by an input email
