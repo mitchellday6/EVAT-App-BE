@@ -64,7 +64,6 @@ export const getInsights = async (req: Request, res: Response) => {
 /**
  * Handles a request to list all charging stations
  */
-
 export const listStations = async (_: Request, res: Response) => {
   const stations = await ChargingStation.find();
   res.json(stations);
