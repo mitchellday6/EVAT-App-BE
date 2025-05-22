@@ -20,3 +20,12 @@ export const getInsights = () => axios.get("/admin/insights");
 
 export const updateAdminCredentials = (data: { username?: string; password?: string }) =>
   axios.put("/admin-auth/update-credentials", data);
+
+export const getStations = () =>
+  axios.get("/admin/stations");
+
+export const updateStation = (id: string, data: any) =>
+  axios.put(`/admin/stations/${id}`, data);
+
+export const deleteStation = (id: string) =>
+  axios.delete(`/admin/stations/${id}`);

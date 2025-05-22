@@ -1,121 +1,315 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "../api/axios";
 
-type Charger = {
+type Station = {
   _id: string;
-  latitude: number;
-  longitude: number;
+  operator?: string;
   connection_type?: string;
-  distance: number;
+  current_type?: string;
+  location: {
+    type: string;
+    coordinates: [number, number]; // [longitude, latitude]
+  };
 };
 
 const Chargers = () => {
-  const [form, setForm] = useState({
+  const [stations, setStations] = useState<Station[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState<Partial<Omit<Station, "_id" | "location">>>({});
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterType, setFilterType] = useState("all");
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newStation, setNewStation] = useState({
+    operator: "",
+    connection_type: "",
+    current_type: "",
     latitude: "",
     longitude: "",
-    radius: "25",
-    connection_type: "none"
   });
-  const [chargers, setChargers] = useState<Charger[]>([]);
-  const [loading, setLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  useEffect(() => {
+    fetchStations();
+  }, []);
 
-  const fetchChargers = async () => {
-    setLoading(true);
+  const fetchStations = async () => {
     try {
-      const res = await axios.post("/altChargers/nearby", {
-        latitude: Number(form.latitude),
-        longitude: Number(form.longitude),
-        radius: Number(form.radius),
-        connection_type: form.connection_type
+      const res = await axios.get("/admin/stations", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
-      setChargers(res.data.chargers);
+      setStations(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
-      alert("Failed to fetch chargers. Check coordinates and radius.");
+      console.error("Failed to fetch stations:", err);
+      setStations([]);
     } finally {
       setLoading(false);
     }
   };
 
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this station?")) return;
+    try {
+      await axios.delete(`/admin/stations/${id}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      setStations((prev) => prev.filter((s) => s._id !== id));
+    } catch (err) {
+      alert("Failed to delete station.");
+    }
+  };
+
+  const startEdit = (station: Station) => {
+    setEditingId(station._id);
+    setEditForm({
+      operator: station.operator,
+      connection_type: station.connection_type,
+      current_type: station.current_type,
+    });
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditForm({});
+  };
+
+  const saveEdit = async (id: string) => {
+    try {
+      const res = await axios.put(`/admin/stations/${id}`, editForm, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      setStations((prev) => prev.map((s) => (s._id === id ? res.data : s)));
+      cancelEdit();
+    } catch (err) {
+      alert("Failed to update station.");
+    }
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    setEditForm({ ...editForm, [e.target.name]: e.target.value });
+  };
+
+  const handleAddChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    setNewStation({ ...newStation, [e.target.name]: e.target.value });
+  };
+
+  const handleAddStation = async () => {
+    try {
+      await axios.post(
+        "/admin/stations",
+        {
+          operator: newStation.operator,
+          connection_type: newStation.connection_type,
+          current_type: newStation.current_type,
+          location: {
+            type: "Point",
+            coordinates: [
+              parseFloat(newStation.longitude),
+              parseFloat(newStation.latitude),
+            ],
+          },
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      setNewStation({
+        operator: "",
+        connection_type: "",
+        current_type: "",
+        latitude: "",
+        longitude: "",
+      });
+      setShowAddForm(false);
+      fetchStations();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to add charging station.");
+    }
+  };
+
+  const filteredStations = stations.filter((station) => {
+    const matchesSearch = station.operator?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesFilter =
+      filterType === "all" || station.connection_type?.toLowerCase() === filterType;
+    return matchesSearch && matchesFilter;
+  });
+
+  const uniqueTypes = Array.from(new Set(stations.map((s) => s.connection_type))).filter(Boolean);
+
   return (
-    <div>
-      <h2 className="text-2xl font-semibold mb-4">Nearby Charging Stations</h2>
-      <div className="flex flex-wrap gap-4 mb-4">
-        <input
-          type="text"
-          name="latitude"
-          placeholder="Latitude"
-          value={form.latitude}
-          onChange={handleChange}
-          className="border px-2 py-1 rounded w-40"
-        />
-        <input
-          type="text"
-          name="longitude"
-          placeholder="Longitude"
-          value={form.longitude}
-          onChange={handleChange}
-          className="border px-2 py-1 rounded w-40"
-        />
-        <input
-          type="text"
-          name="radius"
-          placeholder="Radius (km)"
-          value={form.radius}
-          onChange={handleChange}
-          className="border px-2 py-1 rounded w-40"
-        />
-        <select
-          name="connection_type"
-          value={form.connection_type}
-          onChange={handleChange}
-          className="border px-2 py-1 rounded w-40"
-        >
-          <option value="none">All Types</option>
-          <option value="type2">Type 2</option>
-          <option value="ccs">CCS</option>
-          <option value="chademo">CHAdeMO</option>
-        </select>
+    <div className="animate-fade-in">
+      {/* Header & Add Button */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <h2 className="text-2xl font-bold text-green-800 dark:text-green-100">
+          Admin: Charging Station Management
+        </h2>
         <button
-          onClick={fetchChargers}
-          className="bg-blue-600 text-white px-4 py-1 rounded"
+          onClick={() => setShowAddForm(!showAddForm)}
+          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow"
         >
-          {loading ? "Loading..." : "Search"}
+          {showAddForm ? "Cancel" : "➕ Add Charger"}
         </button>
       </div>
 
-      {chargers.length > 0 && (
-        <div className="overflow-x-auto">
-          <table className="w-full max-w-5xl table-auto border border-gray-300 shadow text-sm">
-            <thead className="bg-gray-100">
+      {/* Search + Filter */}
+      <div className="flex flex-wrap gap-4 mb-6">
+        <input
+          type="text"
+          placeholder="Search by operator"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="border px-3 py-2 rounded dark:bg-gray-800 dark:text-white w-64"
+        />
+        <select
+          value={filterType}
+          onChange={(e) => setFilterType(e.target.value)}
+          className="border px-3 py-2 rounded dark:bg-gray-800 dark:text-white"
+        >
+          <option value="all">All Types</option>
+          {uniqueTypes.map((type) => (
+            <option key={type} value={type.toLowerCase()}>{type}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* Add Station Form */}
+      {showAddForm && (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleAddStation();
+          }}
+          className="mb-6 p-4 border rounded bg-white dark:bg-gray-800 shadow space-y-3"
+        >
+          {["operator", "connection_type", "current_type", "latitude", "longitude"].map((field) => (
+            <div key={field}>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 capitalize">
+                {field.replace("_", " ")}
+              </label>
+              <input
+                type={field === "latitude" || field === "longitude" ? "number" : "text"}
+                name={field}
+                placeholder={`Enter ${field}`}
+                value={newStation[field as keyof typeof newStation]}
+                onChange={handleAddChange}
+                className="w-full border px-3 py-2 rounded dark:bg-gray-700 dark:text-white"
+                required
+              />
+            </div>
+          ))}
+          <button
+            type="submit"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+          >
+            Submit
+          </button>
+        </form>
+      )}
+
+      {/* Table */}
+      {loading ? (
+        <p className="text-gray-500 dark:text-gray-300">Loading stations...</p>
+      ) : (
+        <div className="overflow-x-auto rounded shadow">
+          <table className="w-full table-auto border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm">
+            <thead className="bg-green-100 dark:bg-green-700 text-green-900 dark:text-white">
               <tr>
-                <th className="px-3 py-2 border-b">Charger ID</th>
-                <th className="px-3 py-2 border-b">Latitude</th>
-                <th className="px-3 py-2 border-b">Longitude</th>
-                <th className="px-3 py-2 border-b">Type</th>
-                <th className="px-3 py-2 border-b">Distance (km)</th>
+                <th className="px-4 py-2 border-b">Operator</th>
+                <th className="px-4 py-2 border-b">Connection Type</th>
+                <th className="px-4 py-2 border-b">Current Type</th>
+                <th className="px-4 py-2 border-b">Latitude</th>
+                <th className="px-4 py-2 border-b">Longitude</th>
+                <th className="px-4 py-2 border-b text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {chargers.map((charger) => (
-                <tr key={charger._id}>
-                  <td className="px-3 py-2 border-b">{charger._id}</td>
-                  <td className="px-3 py-2 border-b">{charger.latitude}</td>
-                  <td className="px-3 py-2 border-b">{charger.longitude}</td>
-                  <td className="px-3 py-2 border-b">{charger.connection_type || "N/A"}</td>
-                  <td className="px-3 py-2 border-b">{charger.distance.toFixed(2)}</td>
+              {filteredStations.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="text-center py-4 text-gray-500 dark:text-gray-400">
+                    No stations match your filters.
+                  </td>
                 </tr>
-              ))}
+              ) : (
+                filteredStations.map((station) => {
+                  const [lng, lat] = station.location?.coordinates || ["—", "—"];
+                  return (
+                    <tr key={station._id}>
+                      <td className="px-4 py-2 border-b">
+                        {editingId === station._id ? (
+                          <input
+                            type="text"
+                            name="operator"
+                            value={editForm.operator || ""}
+                            onChange={handleChange}
+                            className="border px-2 py-1 w-full rounded"
+                          />
+                        ) : (
+                          station.operator || <span className="italic text-gray-400">N/A</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-2 border-b">
+                        {editingId === station._id ? (
+                          <input
+                            type="text"
+                            name="connection_type"
+                            value={editForm.connection_type || ""}
+                            onChange={handleChange}
+                            className="border px-2 py-1 w-full rounded"
+                          />
+                        ) : (
+                          station.connection_type || <span className="italic text-gray-400">N/A</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-2 border-b">{station.current_type || "—"}</td>
+                      <td className="px-4 py-2 border-b">{lat ?? "—"}</td>
+                      <td className="px-4 py-2 border-b">{lng ?? "—"}</td>
+                      <td className="px-4 py-2 border-b text-center space-x-2">
+                        {editingId === station._id ? (
+                          <>
+                            <button
+                              onClick={() => saveEdit(station._id)}
+                              className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded"
+                            >
+                              Save
+                            </button>
+                            <button
+                              onClick={cancelEdit}
+                              className="bg-gray-400 hover:bg-gray-500 text-white px-3 py-1 rounded"
+                            >
+                              Cancel
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              onClick={() => startEdit(station)}
+                              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDelete(station._id)}
+                              className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded"
+                            >
+                              Delete
+                            </button>
+                          </>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>
-      )}
-
-      {chargers.length === 0 && !loading && (
-        <p className="text-gray-500 mt-4">No chargers found for the given location.</p>
       )}
     </div>
   );
